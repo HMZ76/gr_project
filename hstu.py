@@ -126,7 +126,7 @@ class HSTU(nn.Module):
         # Item embedding
         x = self.item_embedding(input_ids)  # [B, L, D]
         x = self.emb_dropout(x)
-
+        
         # Apply HSTU layers
         for layer in self.layers:
             x = layer(x, causal_mask, padding_mask, timestamps)
@@ -469,10 +469,10 @@ class TemporalBias(nn.Module):
 
 
 if __name__ == "__main__":
-    from dataset import hstu_collate_fn, hstu_eval_collate_fn, AmazonHSTUDataset
+    from dataset import hstu_collate_fn, hstu_eval_collate_fn, AmazonDataset
     from torch.utils.data import DataLoader
 
-    dataset = AmazonHSTUDataset(
+    dataset = AmazonDataset(
         root="../genrec/dataset/amazon",
         split="beauty",
         train_test_split="train",

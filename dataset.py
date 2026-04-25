@@ -268,7 +268,7 @@ class TigerDataset(Dataset):
     def __init__(
         self,
         root: str = "dataset/amazon",
-        rqvae_path: str = None,
+        rqvae_path: str = "rqvae_best_model.pth",
         split: str = "beauty",
         device: Optional[torch.device] = None,
         train_test_split: str = "train",
@@ -325,7 +325,6 @@ class TigerDataset(Dataset):
                 _, semantic_indices = self.rqvae.rq(z)  
                 self.semantic_indices = torch.stack(semantic_indices, dim=1).cpu().numpy() 
                 self.semantic_indices = self.semantic_indices
-                print(self.semantic_indices[6845])
         # 4. 生成切片样本 (超快速的 Array Indexing)
         self._generate_samples()
 
@@ -513,7 +512,61 @@ class TigerDataset(Dataset):
     def __getitem__(self, idx: int) -> Dict:
         return self.samples[idx]
 
+class ColdStartEvalDataset(TigerDataset): # 或者继承 AmazonDataset
+    def __init__(
+        self,
+        cold_start_type: str = "user", # 可选: 'user', 'item', 'both'
+        user_max_inter: int = 5,       # 历史交互数 <= 5 视为冷启动用户
+        item_max_freq: int = 10,       # 在训练集中出现次数 <= 10 视为冷启动物品
+        **kwargs
+    ):
+        # ⚠️ 冷启动测试通常仅用于线下评估阶段
+        if kwargs.get("train_test_split", "test") == "train":
+            raise ValueError("冷启动数据集只能用于 'valid' 或 'test' split！")
+            
+        # 1. 先调用父类初始化，完成全量样本的提取和 Embedding 预计算
+        super().__init__(**kwargs)
+        
+        self.cold_start_type = cold_start_type.lower()
+        self.user_max_inter = user_max_inter
+        self.item_max_freq = item_max_freq
+        
+        # 2. 执行冷启动样本过滤
+        self._filter_cold_start_samples()
 
+    def _filter_cold_start_samples(self) -> None:
+        """从生成的 samples 中过滤出符合冷启动定义的测试样本"""
+        # 统计所有物品在【训练集】中出现的频次 (模拟真实的冷门尾部物品)
+        # 注意：训练集使用的是 items[:-2]
+        item_train_freq = np.zeros(self.num_items, dtype=int)
+        for _, items, _ in self.sequences:
+            for it in items[:-2]:
+                item_train_freq[it - 1] += 1
+                
+        original_len = len(self.samples)
+        filtered_samples = []
+        
+        for sample in self.samples:
+            history = sample['history']
+            target = sample['target']
+            
+            # 条件 A：该用户是否为冷启动用户？
+            # 我们通过当前样本的 history 长度近似判断
+            is_cold_user = (len(history) + 1) <= self.user_max_inter
+            
+            # 条件 B：该 Target 物品是否为冷门物品？
+            is_cold_item = item_train_freq[target] <= self.item_max_freq
+            
+            # 路由分配
+            if self.cold_start_type == "user" and is_cold_user:
+                filtered_samples.append(sample)
+            elif self.cold_start_type == "item" and is_cold_item:
+                filtered_samples.append(sample)
+            elif self.cold_start_type == "both" and (is_cold_user and is_cold_item):
+                filtered_samples.append(sample)
+                
+        self.samples = filtered_samples
+        print(f"❄️ 冷启动过滤完成 [{self.cold_start_type} 模式] | 样本数从 {original_len} 锐减至 -> {len(self.samples)}")
 
 # ==========================================
 # TIGER (Generative) Collate Function
@@ -723,66 +776,221 @@ def hstu_eval_collate_fn(batch: List[Dict], max_seq_len: int = 50):
         'timestamps': torch.tensor(timestamps, dtype=torch.long),
     }
 
-def hmsr_collate_fn(batch: List[Dict], max_seq_len: int = 50, num_items: int = 0):
+import torch
+import numpy as np
+from typing import Dict, List
+
+def hmsr_collate_fn(batch: List[Dict], max_seq_len: int = 50):
     """
-    Collate function for HSTU.
-    Similar to SASRec but also handles semantic IDs and token type IDs.
+    HMSR Training Collate Function.
+    Generates fully aligned item-level and semantic-level tensors with shifted targets.
     """
-    histories = [b['history'] for b in batch]
-    targets = [b['target'] for b in batch]
-    timestamps_list = [b['timestamps'] for b in batch]
-    history_sids = [b['history_sid'] for b in batch]  
-    target_sids = [b['target_sid'] for b in batch]      
+    B = len(batch)
+    sem_id_dim = 3  # RQ-VAE codebooks
+    
+    # ================= 1. 初始化 Item-Level Tensors (长度 L) =================
+    user_ids = torch.zeros(B, dtype=torch.long)
+    input_item_ids = torch.zeros((B, max_seq_len), dtype=torch.long)
+    timestamps = torch.zeros((B, max_seq_len), dtype=torch.long)
+    target_item_ids = torch.zeros((B, max_seq_len), dtype=torch.long)
+    item_seq_mask = torch.zeros((B, max_seq_len), dtype=torch.long)
 
-    max_len = min(max(len(h) for h in histories), max_seq_len)
+    # ================= 2. 初始化 Semantic-Level Tensors (长度 L * 3) =================
+    max_sem_len = max_seq_len * sem_id_dim
+    history_sids = torch.zeros((B, max_sem_len), dtype=torch.long)
+    target_sids = torch.zeros((B, max_sem_len), dtype=torch.long)
+    token_type_ids = torch.zeros((B, max_sem_len), dtype=torch.long)
+    semantic_seq_mask = torch.zeros((B, max_sem_len), dtype=torch.long)
 
-    item_input_ids, token_type_ids, seq_mask = [], [], []
-    target_input_ids, target_token_type_ids = [], []
+    for i, sample in enumerate(batch):
+        user_ids[i] = sample['user_id']
 
-    for history, target, ts, his_sid, tgt_sid in zip(histories, targets, timestamps_list, history_sids, target_sids):
-        if len(history) > max_len:
-            history = history[-max_len:]
-            ts = ts[-max_len:]
-            his_sid = his_sid[-max_len:]
+        his_items = sample['history']
+        tgt_item = sample['target']
+        his_ts = sample['timestamps']
+        his_sid = sample['history_sid']  # np.array shape: (L, 3)
+        tgt_sid = sample['target_sid']   # np.array shape: (3,)
 
-        pad_len = max_len - len(history)
+        # 序列截断 (保留最新的 max_seq_len 个交互)
+        if len(his_items) > max_seq_len:
+            his_items = his_items[-max_seq_len:]
+            his_ts = his_ts[-max_seq_len:]
+            his_sid = his_sid[-max_seq_len:]
+
+        L = len(his_items)
+
+        # --- 填充 Item-Level (左侧填充) ---
+        input_item_ids[i, max_seq_len - L:] = torch.tensor(his_items, dtype=torch.long)
+        timestamps[i, max_seq_len - L:] = torch.tensor(his_ts, dtype=torch.long)
+        item_seq_mask[i, max_seq_len - L:] = 1
         
-        item_input_ids.append([0] * pad_len + history)
-        token_type_ids.append([0] * pad_len + [i % 3 for i in range(len(history))])
-        seq_mask.append([0] * pad_len + [1] * len(history))
+        # 训练特供：生成 targets 序列 (整体向后移位 1 步)
+        tgt_seq = his_items[1:] + [tgt_item]
+        target_item_ids[i, max_seq_len - L:] = torch.tensor(tgt_seq, dtype=torch.long)
 
-        target_input_ids.append(tgt_sid)
-        target_token_type_ids.append([0, 1, 2])  
+        # --- 填充 Semantic-Level (展平后左侧填充) ---
+        his_sid_flat = torch.from_numpy(his_sid).view(-1)
+        flat_L = len(his_sid_flat)
+        start_idx = max_sem_len - flat_L
 
-    result = {
-        'item_input_ids': torch.tensor(item_input_ids, dtype=torch.long),
-        'token_type_ids': torch.tensor(token_type_ids, dtype=torch.long),
-        'seq_mask': torch.tensor(seq_mask, dtype=torch.long),
-        'target_input_ids': torch.tensor(target_input_ids, dtype=torch.long),
-        'target_token_type_ids': torch.tensor(target_token_type_ids, dtype=torch.long),
+        history_sids[i, start_idx:] = his_sid_flat
+        token_type_ids[i, start_idx:] = torch.arange(flat_L) % sem_id_dim
+        semantic_seq_mask[i, start_idx:] = 1
+
+        # 训练特供：生成 targets 语义序列 (his_sid 移位 1 个 Item，并接上 tgt_sid)
+        tgt_sid_seq = np.concatenate([his_sid[1:], tgt_sid[np.newaxis, :]], axis=0)
+        target_sids[i, start_idx:] = torch.from_numpy(tgt_sid_seq).view(-1)
+
+    return {
+        "user_id": user_ids,                    # [B]
+        "input_item_ids": input_item_ids,       # [B, L]
+        "timestamps": timestamps,               # [B, L]
+        "item_seq_mask": item_seq_mask,         # [B, L]
+        "target_item_ids": target_item_ids,     # [B, L]
+        "history_sid": history_sids,            # [B, L * 3]
+        "token_type_ids": token_type_ids,       # [B, L * 3]
+        "semantic_seq_mask": semantic_seq_mask, # [B, L * 3]
+        "target_sids": target_sids              # [B, L * 3]
     }
 
-    return result
+def hmsr_eval_collate_fn(batch: List[Dict], max_seq_len: int = 50):
+    """
+    HMSR Evaluation Collate Function.
+    Provides full sequences for input, but single elements for targets.
+    """
+    B = len(batch)
+    sem_id_dim = 3
+    
+    # ================= 1. 初始化 Input Tensors =================
+    user_ids = torch.zeros(B, dtype=torch.long)
+    input_item_ids = torch.zeros((B, max_seq_len), dtype=torch.long)
+    timestamps = torch.zeros((B, max_seq_len), dtype=torch.long)
+    item_seq_mask = torch.zeros((B, max_seq_len), dtype=torch.long)
+
+    max_sem_len = max_seq_len * sem_id_dim
+    history_sids = torch.zeros((B, max_sem_len), dtype=torch.long)
+    token_type_ids = torch.zeros((B, max_sem_len), dtype=torch.long)
+    semantic_seq_mask = torch.zeros((B, max_sem_len), dtype=torch.long)
+
+    # ================= 2. 初始化 Target Tensors (单一目标) =================
+    target_item_ids = torch.zeros(B, dtype=torch.long)
+    target_sids = torch.zeros((B, sem_id_dim), dtype=torch.long)
+
+    for i, sample in enumerate(batch):
+        user_ids[i] = sample['user_id']
+        target_item_ids[i] = sample['target']
+        target_sids[i] = torch.from_numpy(sample['target_sid'])
+
+        his_items = sample['history']
+        his_ts = sample['timestamps']
+        his_sid = sample['history_sid']
+
+        if len(his_items) > max_seq_len:
+            his_items = his_items[-max_seq_len:]
+            his_ts = his_ts[-max_seq_len:]
+            his_sid = his_sid[-max_seq_len:]
+
+        L = len(his_items)
+
+        # --- Input Items ---
+        input_item_ids[i, max_seq_len - L:] = torch.tensor(his_items, dtype=torch.long)
+        timestamps[i, max_seq_len - L:] = torch.tensor(his_ts, dtype=torch.long)
+        item_seq_mask[i, max_seq_len - L:] = 1
+
+        # --- Input Semantics ---
+        his_sid_flat = torch.from_numpy(his_sid).view(-1)
+        flat_L = len(his_sid_flat)
+        start_idx = max_sem_len - flat_L
+
+        history_sids[i, start_idx:] = his_sid_flat
+        token_type_ids[i, start_idx:] = torch.arange(flat_L) % sem_id_dim
+        semantic_seq_mask[i, start_idx:] = 1
+
+    return {
+        "user_id": user_ids,                    # [B]
+        "input_item_ids": input_item_ids,       # [B, L]
+        "timestamps": timestamps,               # [B, L]
+        "item_seq_mask": item_seq_mask,         # [B, L]
+        "history_sid": history_sids,            # [B, L * 3]
+        "token_type_ids": token_type_ids,       # [B, L * 3]
+        "semantic_seq_mask": semantic_seq_mask, # [B, L * 3]
+        "target_item_ids": target_item_ids,     # [B]       <-- 区别点
+        "target_sids": target_sids              # [B, 3]    <-- 区别点
+    }
+
 
 if __name__ == "__main__":
     from torch.utils.data import DataLoader
-    # 记得把 rqvae_weight_path 换成你服务器上真实的路径
-    dataset = TigerDataset(
-        root="../genrec/dataset/amazon",
-        rqvae_path="/opt/data/private/hmz/rec/grec/rqvae_best_model.pth",
-        split="beauty", 
-        train_test_split="train", 
-        max_seq_len=50, 
-        min_seq_len=5
-    )
-    print(dataset[0])
-    print(len(dataset))
+    
+    print("🚀 === 开始测试 HMSR Collate Functions ===")
+    
+    # 1. 实例化数据集 (请确保路径与你服务器一致)
+    # 为了测试方便，我们将 max_seq_len 设为 10，观察起来更直观
+    TEST_MAX_LEN = 10
+    
+    try:
+        # 这里以 Train 模式初始化
+        test_dataset = TigerDataset(
+            root="../genrec/dataset/amazon",
+            rqvae_path="/opt/data/private/hmz/rec/grec/rqvae_best_model.pth", 
+            split="beauty", 
+            train_test_split="train", 
+            max_seq_len=TEST_MAX_LEN, 
+            min_seq_len=2
+        )
+        
+        # ==========================================
+        # 测试 1: Training Collate (包含 shifted 序列目标)
+        # ==========================================
+        print("\n" + "="*50)
+        print("🧪 测试 1: 训练阶段 Collate (hmsr_collate_fn)")
+        print("="*50)
+        
+        train_loader = DataLoader(
+            test_dataset, 
+            batch_size=2,   # 抽出 2 个样本对比 Padding 效果
+            shuffle=True, 
+            # 注意：通过 lambda 将 TEST_MAX_LEN 传给 collate_fn
+            collate_fn=lambda b: hmsr_collate_fn(b, max_seq_len=TEST_MAX_LEN) 
+        )
+        
+        train_batch = next(iter(train_loader))
+        for key, tensor in train_batch.items():
+            # 格式化打印，对齐输出结果
+            print(f"字段: {key:<20} | 维度: {tensor.shape} | 类型: {tensor.dtype}")
+            
+        print("\n[样例验证] 第 1 个样本的 item_seq_mask (左侧补0):")
+        print(train_batch["item_seq_mask"][0].tolist())
+        
+        print(f"\n[样例验证] 第 1 个样本的 token_type_ids (期望是 0,1,2 循环):")
+        print(train_batch["token_type_ids"][0].tolist())
 
-    dataset = AmazonDataset(
-        root="../genrec/dataset/amazon",
-        split="beauty", 
-        train_test_split="train", 
-        max_seq_len=50, 
-        min_seq_len=5
-    )
-    print(dataset[0])
+
+        # ==========================================
+        # 测试 2: Evaluation Collate (单一预测目标)
+        # ==========================================
+        print("\n" + "="*50)
+        print("🧪 测试 2: 验证阶段 Collate (hmsr_eval_collate_fn)")
+        print("="*50)
+        
+        # 强制修改当前数据集的切分模式，并重新生成样本 (仅供快速测试)
+        test_dataset.train_test_split = "valid"
+        test_dataset._generate_samples()
+        
+        eval_loader = DataLoader(
+            test_dataset, 
+            batch_size=2, 
+            shuffle=False, 
+            collate_fn=lambda b: hmsr_eval_collate_fn(b, max_seq_len=TEST_MAX_LEN) 
+        )
+        
+        eval_batch = next(iter(eval_loader))
+        for key, tensor in eval_batch.items():
+            print(f"字段: {key:<20} | 维度: {tensor.shape} | 类型: {tensor.dtype}")
+            
+        print("\n[差异验证] 注意观察 target_item_ids 已经从 [B, L] 变成了 [B] 标量")
+        print(f"Target Item IDs: {eval_batch['target_item_ids'].tolist()}")
+        print(f"Target Semantic IDs:\n{eval_batch['target_sids'].tolist()}")
+
+    except Exception as e:
+        print(f"\n❌ 测试失败，请检查路径或配置: {e}")

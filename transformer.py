@@ -533,6 +533,7 @@ class TransformerEncoderDecoder(nn.Module):
         decoder_bidirectional: bool = True,
     ) -> None:
         super().__init__()
+        
         self.encoder = TransformerEncoder(
             dim=d_model,
             depth=num_encoder_layers,

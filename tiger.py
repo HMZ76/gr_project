@@ -232,19 +232,6 @@ def build_tensor_trie(
 
     return children_mask, transition, num_nodes
 
-class TigerOutput(NamedTuple):
-    """
-    Tiger output
-    """
-    logits: torch.Tensor
-    loss: torch.Tensor
-
-class TigerGenerationOutput(NamedTuple):
-    """
-    Tiger generation output
-    """
-    sem_ids: torch.Tensor
-    log_probas: torch.Tensor
 
 
 class Tiger(nn.Module):

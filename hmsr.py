@@ -14,33 +14,62 @@ import torch.nn.functional as F
 from typing import Optional, Tuple
 import math
 
-class SemIdEmbedding(nn.Module):
-    """语义 ID 嵌入层"""
-    def __init__(self, num_embeddings: int, sem_ids_dim: int, embeddings_dim: int):
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from typing import Optional, Tuple
+import math
+
+class SemanticFusionLayer(nn.Module):
+    """
+    语义 ID 融合层
+    负责将 RQ-VAE 展平的 [B, L*3] 的语义特征，还原、映射并融合为 [B, L, D] 的稠密向量。
+    """
+    def __init__(self, num_codebooks: int, codebook_size: int, embed_dim: int):
         super().__init__()
-        self.num_embeddings = num_embeddings
-        self.sem_ids_dim = sem_ids_dim
-        self.vocab_size = num_embeddings * sem_ids_dim + 1
-        self.emb = nn.Embedding(self.vocab_size, embeddings_dim)
+        self.num_codebooks = num_codebooks
+        self.codebook_size = codebook_size
+        
+        # 词表大小 = codebook数量 * 每个codebook的大小 + 1 (用于全局 Padding)
+        self.vocab_size = num_codebooks * codebook_size + 1
+        self.emb = nn.Embedding(self.vocab_size+1000, embed_dim, padding_idx=0)
+        
+        # 融合投影 (可选：对相加后的语义向量进行一次非线性变换)
+        self.fusion_proj = nn.Sequential(
+            nn.Linear(embed_dim, embed_dim),
+            nn.SiLU(),
+            nn.LayerNorm(embed_dim)
+        )
 
-    def forward(self, input_ids: torch.Tensor, token_type_ids: torch.Tensor) -> torch.Tensor:
-        mapped_ids = token_type_ids * self.num_embeddings + input_ids
-        return self.emb(mapped_ids)
-    
+    def forward(self, semantic_ids: torch.Tensor, token_type_ids: torch.Tensor) -> torch.Tensor:
+        """
+        Args:
+            semantic_ids: [..., 3]
+            token_type_ids: [..., 3]
+        """
+        # 防止 padding 的 0 被映射到奇怪的区间
+        valid_mask = (semantic_ids != 0).long()
+        
+        # 空间映射：把 3 个 codebook 拉平到一个 Vocab 空间中。+1 是为了给 padding 留出 0
+        mapped_ids = (token_type_ids * self.codebook_size + semantic_ids + 1) * valid_mask
+        
+        # [..., 3, D]
+        embs = self.emb(mapped_ids)
+        
+        # 在 Codebook 维度上求和融合 [..., 3, D] -> [..., D]
+        summed_embs = embs.sum(dim=-2)
+        
+        return self.fusion_proj(summed_embs)
 
-class HSTU(nn.Module):
+
+class HMSR_HSTU(nn.Module):
     """
-    HSTU model for sequential recommendation.
-
-    Architecture:
-        Input -> Item Embedding + (optional) Temporal Encoding
-              -> [HSTU Layer × num_blocks]
-              -> Prediction (dot product with item embeddings)
+    Hybrid Semantic & Item ID HSTU (HMSR-HSTU)
     """
-
     def __init__(
         self,
         num_items: int,
+        item_semantic_map: torch.Tensor, # 🌟 新增：全量物品的 Semantic IDs 映射表 [num_items+1, 3]
         max_seq_len: int = 50,
         embed_dim: int = 64,
         num_heads: int = 2,
@@ -50,56 +79,39 @@ class HSTU(nn.Module):
         num_time_buckets: int = 64,
         max_position_distance: int = 128,
         use_temporal_bias: bool = True,
-        num_item_embeddings: int = 256,
-        sem_id_dim: int = 3,
+        num_codebooks: int = 3,          # RQ-VAE codebook 数量
+        codebook_size: int = 256,        # RQ-VAE codebook 字典大小
     ):
-        """
-        Args:
-            num_items: Total number of items
-            max_seq_len: Maximum sequence length
-            embed_dim: Embedding dimension
-            num_heads: Number of attention heads
-            num_blocks: Number of HSTU layers
-            dropout: Dropout rate
-            num_position_buckets: Number of buckets for position bias
-            num_time_buckets: Number of buckets for temporal bias
-            max_position_distance: Max distance for position bucketing
-            use_temporal_bias: Whether to use temporal attention bias
-        """
         super().__init__()
         self.num_items = num_items
         self.max_seq_len = max_seq_len
         self.embed_dim = embed_dim
         self.use_temporal_bias = use_temporal_bias
-        self.vocab_size = num_item_embeddings * sem_id_dim + 1
+        self.num_codebooks = num_codebooks
 
-        # Item embedding (0 is padding)
+        # 将全局语义映射表注册为 Buffer (不参与梯度更新，但随模型保存并在同设备上)
+        # 确保它的 shape 是 [num_items+1, 3]
+        self.register_buffer("item_semantic_map", item_semantic_map)
+
+        # 1. 传统 Item Embedding
         self.item_embedding = nn.Embedding(num_items + 1, embed_dim, padding_idx=0)
-
-        # Semantic ID embedding
-        self.sem_id_embedding = SemIdEmbedding(num_item_embeddings, sem_id_dim, embed_dim)
         
+        # 2. 语义 Semantic Embedding
+        self.semantic_fusion = SemanticFusionLayer(num_codebooks, codebook_size, embed_dim)
 
-        # Embedding dropout
         self.emb_dropout = nn.Dropout(dropout)
 
-        # HSTU layers
+        # 3. HSTU Blocks
         self.layers = nn.ModuleList([
             HSTULayer(
-                embed_dim=embed_dim,
-                num_heads=num_heads,
-                dropout=dropout,
-                num_position_buckets=num_position_buckets,
-                num_time_buckets=num_time_buckets,
-                max_position_distance=max_position_distance,
-                use_temporal_bias=use_temporal_bias,
+                embed_dim=embed_dim, num_heads=num_heads, dropout=dropout,
+                num_position_buckets=num_position_buckets, num_time_buckets=num_time_buckets,
+                max_position_distance=max_position_distance, use_temporal_bias=use_temporal_bias,
             )
             for _ in range(num_blocks)
         ])
 
-        # Final layer norm
         self.final_norm = nn.LayerNorm(embed_dim)
-
         self._init_weights()
 
     def _init_weights(self):
@@ -116,53 +128,67 @@ class HSTU(nn.Module):
                 nn.init.ones_(module.weight)
                 nn.init.zeros_(module.bias)
 
+    def get_fused_item_embeddings(self, item_ids: torch.Tensor) -> torch.Tensor:
+        """
+        核心机制：动态提取任意 item_ids 的 [传统ID嵌入 + 语义嵌入]
+        """
+        # 1. 基础 Item ID Embedding
+        id_embs = self.item_embedding(item_ids) # [..., D]
+        
+        # 2. 查表获取 Semantic IDs
+        
+        sem_ids = self.item_semantic_map[item_ids] # [..., 3]
+        
+        # 3. 动态生成 Token Type IDs (0, 1, 2)
+        type_ids = torch.arange(self.num_codebooks, device=item_ids.device).expand_as(sem_ids)
+        
+        # 4. 获取语义 Embedding
+        sem_embs = self.semantic_fusion(sem_ids, type_ids) # [..., D]
+        
+        # 🌟 强强联手：融合
+        return id_embs + sem_embs
+
     def forward(
         self,
-        input_ids: torch.Tensor,  # [B, L]
-        token_type_ids: Optional[torch.Tensor] = None,
-        history_sid: Optional[torch.Tensor] = None,  # [B, L, 3]
-        timestamps: Optional[torch.Tensor] = None,  # [B, L] unix timestamps
-        targets: Optional[torch.Tensor] = None,  # [B, L] for training
+        input_item_ids: torch.Tensor,       # [B, L]
+        history_sid: torch.Tensor,          # [B, L*3] (来自 hmsr_collate_fn)
+        token_type_ids: torch.Tensor,       # [B, L*3] (来自 hmsr_collate_fn)
+        timestamps: Optional[torch.Tensor] = None, 
+        targets: Optional[torch.Tensor] = None, # 这里指 target_item_ids [B, L]
     ) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
-        """
-        Forward pass.
+        
+        B, L = input_item_ids.shape
+        device = input_item_ids.device
 
-        Args:
-            input_ids: Item ID sequence [B, L], 0 is padding
-            timestamps: Unix timestamps [B, L], optional for temporal bias
-            targets: Target item IDs [B, L] for loss computation
-
-        Returns:
-            logits: Prediction logits [B, L, num_items+1]
-            loss: Cross-entropy loss if targets provided
-        """
-        B, L = input_ids.shape
-        device = input_ids.device
-
-        # Causal mask
+        # Mask 生成
         causal_mask = torch.triu(torch.ones(L, L, device=device), diagonal=1).bool()
+        padding_mask = (input_item_ids == 0)
 
-        # Padding mask
-        padding_mask = (input_ids == 0)
+        # === 🌟 历史特征双轨融合 ===
+        # 1. 处理 Item ID
+        x_id = self.item_embedding(input_item_ids)
+        
+        # 2. 处理 Semantic ID (将 [B, L*3] 转换为 [B, L, 3] 后送入语义层)
+        sem_ids_3d = history_sid.view(B, L, self.num_codebooks)
+        type_ids_3d = token_type_ids.view(B, L, self.num_codebooks)
+        x_sem = self.semantic_fusion(sem_ids_3d, type_ids_3d)
 
-        # Item embedding
-        x = self.item_embedding(input_ids)  # [B, L, D]
-        x = self.emb_dropout(x)
-        #SID embedding
-        sid_emb = self.sem_id_embedding(input_ids, token_type_ids)
-        s_emb = self.emb_dropout(sid_emb)
-        s_emb = torch.stack(s_emb, dim=-1)
-        x = torch.cat([x, s_emb], dim=-1)  # [B, L, 4D]
-        # Apply HSTU layers
+        # 3. 相加融合
+        x = self.emb_dropout(x_id + x_sem)
+
+        # === 穿过 HSTU 层 ===
         for layer in self.layers:
             x = layer(x, causal_mask, padding_mask, timestamps)
 
-        x = self.final_norm(x)
+        x = self.final_norm(x) # [B, L, D]
 
-        # Prediction via dot product with item embeddings
-        logits = x @ self.item_embedding.weight.T  # [B, L, V]
+        # === 🌟 预测打分层 (Prediction) ===
+        # 我们需要用全量物品的【融合特征】来算 Logits，而不是光光用 item_embedding
+        all_item_ids = torch.arange(self.num_items + 1, device=device)
+        all_fused_embs = self.get_fused_item_embeddings(all_item_ids) # [V, D]
+        
+        logits = x @ all_fused_embs.T  # [B, L, V]
 
-        # Compute loss
         loss = None
         if targets is not None:
             loss = F.cross_entropy(
@@ -175,81 +201,72 @@ class HSTU(nn.Module):
 
     def forward_sampled_softmax(
         self,
-        input_ids: torch.Tensor,
+        input_item_ids: torch.Tensor,
+        history_sid: torch.Tensor,
+        token_type_ids: torch.Tensor,
         timestamps: Optional[torch.Tensor] = None,
-        targets: Optional[torch.Tensor] = None,
+        targets: Optional[torch.Tensor] = None, # [B, L]
         num_negatives: int = 128,
         temperature: float = 0.05,
-        l2_norm: bool = True,
     ) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
         """
-        Forward with sampled softmax loss (aligned with Meta's original HSTU).
-
-        Instead of computing logits over ALL items, samples a small set of
-        negatives per batch for efficiency and different optimization landscape.
+        带负采样的训练模式 (针对混合语义架构进行了重构)
         """
-        B, L = input_ids.shape
-        device = input_ids.device
+        B, L = input_item_ids.shape
+        device = input_item_ids.device
 
         causal_mask = torch.triu(torch.ones(L, L, device=device), diagonal=1).bool()
-        padding_mask = (input_ids == 0)
+        padding_mask = (input_item_ids == 0)
 
-        x = self.item_embedding(input_ids)
-        x = self.emb_dropout(x)
+        # 融合前向
+        x_id = self.item_embedding(input_item_ids)
+        sem_ids_3d = history_sid.view(B, L, self.num_codebooks)
+        type_ids_3d = token_type_ids.view(B, L, self.num_codebooks)
+        x_sem = self.semantic_fusion(sem_ids_3d, type_ids_3d)
+        
+        x = self.emb_dropout(x_id + x_sem)
 
         for layer in self.layers:
             x = layer(x, causal_mask, padding_mask, timestamps)
 
-        x = self.final_norm(x)  # [B, L, D]
-
-        # Full logits for eval (no loss)
-        logits = x @ self.item_embedding.weight.T  # [B, L, V]
+        x = self.final_norm(x) # [B, L, D]
+        
+        # 评估用 Full Logits
+        all_item_ids = torch.arange(self.num_items + 1, device=device)
+        all_fused_embs = self.get_fused_item_embeddings(all_item_ids)
+        logits = x @ all_fused_embs.T
 
         loss = None
         if targets is not None:
-            # Flatten to [B*L, D] and [B*L]
-            x_flat = x.view(-1, self.embed_dim)  # [B*L, D]
-            targets_flat = targets.view(-1)  # [B*L]
+            x_flat = x.view(-1, self.embed_dim)
+            targets_flat = targets.view(-1)
 
-            # Filter out padding positions
             valid_mask = targets_flat != 0
-            x_valid = x_flat[valid_mask]  # [N, D]
-            targets_valid = targets_flat[valid_mask]  # [N]
+            x_valid = x_flat[valid_mask]
+            targets_valid = targets_flat[valid_mask]
 
             if x_valid.size(0) > 0:
-                # Get positive embeddings
-                pos_emb = self.item_embedding(targets_valid)  # [N, D]
+                # 🌟 获取正样本的融合 Embedding
+                pos_emb = self.get_fused_item_embeddings(targets_valid)
 
-                # Sample random negatives (shared across batch for efficiency)
+                # 🌟 获取负样本的融合 Embedding (采样后动态拼接语义)
                 neg_ids = torch.randint(1, self.num_items + 1, (num_negatives,), device=device)
-                neg_emb = self.item_embedding(neg_ids)  # [K, D]
+                neg_emb = self.get_fused_item_embeddings(neg_ids)
 
-                # L2 normalize if enabled (as in Meta's implementation)
-                if l2_norm:
-                    x_valid = F.normalize(x_valid, dim=-1)
-                    pos_emb = F.normalize(pos_emb, dim=-1)
-                    neg_emb = F.normalize(neg_emb, dim=-1)
+                x_valid = F.normalize(x_valid, dim=-1)
+                pos_emb = F.normalize(pos_emb, dim=-1)
+                neg_emb = F.normalize(neg_emb, dim=-1)
 
-                # Compute logits: [N, 1+K]
-                pos_logits = (x_valid * pos_emb).sum(dim=-1, keepdim=True)  # [N, 1]
-                neg_logits = x_valid @ neg_emb.T  # [N, K]
+                pos_logits = (x_valid * pos_emb).sum(dim=-1, keepdim=True)
+                neg_logits = x_valid @ neg_emb.T
                 all_logits = torch.cat([pos_logits, neg_logits], dim=-1) / temperature
 
-                # Target is always index 0 (positive)
                 loss_targets = torch.zeros(x_valid.size(0), device=device, dtype=torch.long)
                 loss = F.cross_entropy(all_logits, loss_targets)
 
         return logits, loss
 
-    @torch.no_grad()
-    def predict(self, input_ids: torch.Tensor, timestamps: Optional[torch.Tensor] = None, top_k: int = 10) -> torch.Tensor:
-        """Predict top-k items for next item."""
-        logits, _ = self.forward(input_ids, timestamps)
-        last_logits = logits[:, -1, :]
-        last_logits[:, 0] = float('-inf')  # Exclude padding
-        _, top_k_items = torch.topk(last_logits, top_k, dim=-1)
-        return top_k_items
-
+# 注意：HSTULayer, RelativePositionBias, TemporalBias 保持你给出的原样即可，无需修改。
 
 class HSTULayer(nn.Module):
     """
@@ -494,27 +511,4 @@ class TemporalBias(nn.Module):
         return bias
 
 
-if __name__ == "__main__":
-    from dataset import hstu_collate_fn, hstu_eval_collate_fn, AmazonHSTUDataset
-    from torch.utils.data import DataLoader
 
-    dataset = AmazonHSTUDataset(
-        root="../genrec/dataset/amazon",
-        split="beauty",
-        train_test_split="train",
-    )
-    use_temporal_bias = True
-    max_seq_len = dataset.max_seq_len
-    num_items = dataset.num_items
-    model = HSTU(num_items=num_items, use_temporal_bias=True)
-    collate_train = lambda x: hstu_collate_fn(x, max_seq_len)
-    collate_eval = lambda x: hstu_eval_collate_fn(x, max_seq_len)
-
-    dataloader = DataLoader(dataset, batch_size=2, shuffle=True, collate_fn=collate_train)
-    data = next(iter(dataloader))
-    input_ids = data['input_ids']
-    targets = data['targets']
-    negatives = data.get('negatives', None)
-    timestamps = data['timestamps'] if use_temporal_bias else None
-    _, loss = model(input_ids, timestamps, targets)
-    print(loss)
