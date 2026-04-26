@@ -20,58 +20,162 @@ import torch.nn.functional as F
 from typing import Optional, Tuple
 import math
 
+class RotaryEmbedding(nn.Module):
+    """
+    旋转位置编码 (RoPE) 的核心实现。
+    预计算余弦和正弦频率矩阵。
+    """
+    def __init__(self, dim: int, max_seq_len: int = 2048, base: float = 10000.0, device=None):
+        super().__init__()
+        self.dim = dim
+        self.max_seq_len = max_seq_len
+        self.base = base
+        
+        # 计算频率倒数
+        inv_freq = 1.0 / (self.base ** (torch.arange(0, self.dim, 2, dtype=torch.float32, device=device) / self.dim))
+        self.register_buffer("inv_freq", inv_freq, persistent=False)
+        
+        # 预计算 max_seq_len 长度的 cos 和 sin，加速前向传播
+        t = torch.arange(self.max_seq_len, device=device, dtype=torch.float32)
+        freqs = torch.einsum("i,j->ij", t, self.inv_freq) # [max_seq_len, dim/2]
+        emb = torch.cat((freqs, freqs), dim=-1)           # [max_seq_len, dim]
+        
+        self.register_buffer("cos_cached", emb.cos(), persistent=False)
+        self.register_buffer("sin_cached", emb.sin(), persistent=False)
+
+    def forward(self, x: torch.Tensor, seq_len: int) -> Tuple[torch.Tensor, torch.Tensor]:
+        # 返回当前序列长度对应的 cos 和 sin
+        return (
+            self.cos_cached[:seq_len, ...].to(dtype=x.dtype),
+            self.sin_cached[:seq_len, ...].to(dtype=x.dtype),
+        )
+
+def rotate_half(x: torch.Tensor) -> torch.Tensor:
+    """将特征维度的后半部分取负并与前半部分交换，用于 RoPE 的正交旋转"""
+    x1 = x[..., : x.shape[-1] // 2]
+    x2 = x[..., x.shape[-1] // 2 :]
+    return torch.cat((-x2, x1), dim=-1)
+
+def apply_rotary_pos_emb(q: torch.Tensor, k: torch.Tensor, cos: torch.Tensor, sin: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+    """
+    将 RoPE 应用到 Query 和 Key 上
+    q, k: [B, H, L, d]
+    cos, sin: [L, d]
+    """
+    # 增加维度以便广播: [L, d] -> [1, 1, L, d]
+    cos = cos.unsqueeze(0).unsqueeze(0)
+    sin = sin.unsqueeze(0).unsqueeze(0)
+    
+    # 公式: q * cos(theta) + rotate_half(q) * sin(theta)
+    q_embed = (q * cos) + (rotate_half(q) * sin)
+    k_embed = (k * cos) + (rotate_half(k) * sin)
+    return q_embed, k_embed
+
+class FeatureInteractionBlock(nn.Module):
+    """
+    带有【显式特征交叉】的深度交互融合网络。
+    结合了 DCN-v2 (Deep & Cross Network) 的乘法交互机制与 GRN 门控。
+    """
+    def __init__(self, concat_dim: int, base_dim: int, dropout: float = 0.1):
+        """
+        Args:
+            concat_dim: 拼接后的总维度 (e.g., 4 * base_dim)
+            base_dim: 基础特征维度 (D)
+            dropout: 门控层后的 dropout
+        """
+        super().__init__()
+        self.concat_dim = concat_dim
+        
+        # 0. 初始化 LayerNorm
+        self.pre_norm = nn.LayerNorm(concat_dim)
+        
+        # 🌟 1. 显式特征交叉投影 (Cross Projection)
+        # 负责将输入打乱重组，以便与自身进行乘法交互
+        self.cross_proj = nn.Linear(concat_dim, concat_dim)
+        
+        # 2. 深度非线性提取与门控 (Bottleneck)
+        # 用于提取交叉后的高阶模式，并输出门控信号
+        bottleneck_dim = 2 * base_dim 
+        self.bottleneck = nn.Sequential(
+            nn.Linear(concat_dim, bottleneck_dim),
+            nn.SiLU(), 
+            nn.Linear(bottleneck_dim, concat_dim) # 直接映射回 concat_dim 用于 Sigmoid
+        )
+        
+        self.dropout = nn.Dropout(dropout)
+
+    def forward(self, flattened_x: torch.Tensor) -> torch.Tensor:
+        """
+        Args:
+            flattened_x: 原始拼接后的向量 [..., concat_dim]
+        Returns:
+            深度交叉与融合后的向量 [..., concat_dim]
+        """
+        # 初始残差分支
+        residual = flattened_x 
+        
+        # a. 标准化
+        x = self.pre_norm(flattened_x)
+        
+        # === 🌟 核心改进：显式特征交叉 (Explicit Feature Interaction) ===
+        # 原理: x ⊙ (Wx + b) 
+        # 这里发生了真正的向量乘法。ID 维度的值会与映射后的 Sem 维度的值直接相乘，
+        # 实现了推荐系统中极为重要的二阶特征交叉 (2nd-order Feature Crossing)。
+        cross_out = x * self.cross_proj(x)
+        
+        # 将一阶原始特征与二阶交叉特征相加 (DCNv2 标准做法)
+        cross_x = x + cross_out 
+        # ==============================================================
+
+        # b. 深度模式提取与门控信号生成
+        # 模型根据交叉后的丰富特征，决定放行哪些信息
+        gate_signals = torch.sigmoid(self.bottleneck(cross_x)) 
+        
+        # c. 门控过滤与残差相加
+        # 用门控过滤交叉特征，再加上最原始的输入
+        return residual + self.dropout(gate_signals * cross_x)
+    
 class SemanticFusionLayer(nn.Module):
     """
-    语义 ID 融合层
-    负责将 RQ-VAE 展平的 [B, L*3] 的语义特征，还原、映射并融合为 [B, L, D] 的稠密向量。
+    语义 ID 展平层
+    负责将 RQ-VAE 的 [..., 3] 语义 ID 映射并展平为 [..., 3 * embed_dim]
     """
     def __init__(self, num_codebooks: int, codebook_size: int, embed_dim: int):
         super().__init__()
         self.num_codebooks = num_codebooks
         self.codebook_size = codebook_size
+        self.embed_dim = embed_dim
         
         # 词表大小 = codebook数量 * 每个codebook的大小 + 1 (用于全局 Padding)
         self.vocab_size = num_codebooks * codebook_size + 1
-        self.emb = nn.Embedding(self.vocab_size+1000, embed_dim, padding_idx=0)
-        
-        # 融合投影 (可选：对相加后的语义向量进行一次非线性变换)
-        self.fusion_proj = nn.Sequential(
-            nn.Linear(embed_dim, embed_dim),
-            nn.SiLU(),
-            nn.LayerNorm(embed_dim)
-        )
+        self.emb = nn.Embedding(self.vocab_size + 1000, embed_dim, padding_idx=0)
 
     def forward(self, semantic_ids: torch.Tensor, token_type_ids: torch.Tensor) -> torch.Tensor:
         """
         Args:
-            semantic_ids: [..., 3]
-            token_type_ids: [..., 3]
+            semantic_ids: [..., num_codebooks]
+            token_type_ids: [..., num_codebooks]
+        Returns:
+            [..., num_codebooks * embed_dim]
         """
-        # 防止 padding 的 0 被映射到奇怪的区间
         valid_mask = (semantic_ids != 0).long()
-        
-        # 空间映射：把 3 个 codebook 拉平到一个 Vocab 空间中。+1 是为了给 padding 留出 0
         mapped_ids = (token_type_ids * self.codebook_size + semantic_ids + 1) * valid_mask
         
-        # [..., 3, D]
+        # 获取各自的 Embedding: [..., num_codebooks, D]
         embs = self.emb(mapped_ids)
         
-        # 在 Codebook 维度上求和融合 [..., 3, D] -> [..., D]
-        summed_embs = embs.sum(dim=-2)
+        # 🌟 核心修改：直接展平拼接，保持 3 * embed_dim 维度
+        flattened_embs = embs.view(*embs.shape[:-2], self.num_codebooks * self.embed_dim)
         
-        return self.fusion_proj(summed_embs)
-
-
+        return flattened_embs
+    
 class HMSR_HSTU(nn.Module):
-    """
-    Hybrid Semantic & Item ID HSTU (HMSR-HSTU)
-    """
     def __init__(
         self,
         num_items: int,
-        item_semantic_map: torch.Tensor, # 🌟 新增：全量物品的 Semantic IDs 映射表 [num_items+1, 3]
+        item_semantic_map: torch.Tensor, 
         max_seq_len: int = 50,
-        embed_dim: int = 64,
+        embed_dim: int = 64, # 这里指的是单一特征的基础维度
         num_heads: int = 2,
         num_blocks: int = 2,
         dropout: float = 0.2,
@@ -79,41 +183,51 @@ class HMSR_HSTU(nn.Module):
         num_time_buckets: int = 64,
         max_position_distance: int = 128,
         use_temporal_bias: bool = True,
-        num_codebooks: int = 3,          # RQ-VAE codebook 数量
-        codebook_size: int = 256,        # RQ-VAE codebook 字典大小
+        num_codebooks: int = 3,          
+        codebook_size: int = 256,        
     ):
         super().__init__()
         self.num_items = num_items
         self.max_seq_len = max_seq_len
         self.embed_dim = embed_dim
-        self.use_temporal_bias = use_temporal_bias
         self.num_codebooks = num_codebooks
+        self.use_temporal_bias = use_temporal_bias
 
-        # 将全局语义映射表注册为 Buffer (不参与梯度更新，但随模型保存并在同设备上)
-        # 确保它的 shape 是 [num_items+1, 3]
         self.register_buffer("item_semantic_map", item_semantic_map)
 
-        # 1. 传统 Item Embedding
+        # 1. 传统 Item Embedding -> 输出维度 [..., embed_dim]
         self.item_embedding = nn.Embedding(num_items + 1, embed_dim, padding_idx=0)
         
-        # 2. 语义 Semantic Embedding
+        # 2. 语义 Semantic Embedding -> 输出维度 [..., 3 * embed_dim]
         self.semantic_fusion = SemanticFusionLayer(num_codebooks, codebook_size, embed_dim)
+
+        # 🌟 核心修改 1：计算拼接后的总维度
+        # 总维度 = 基础 ID 维度 (1倍) + 语义 ID 维度 (3倍) = 4 * embed_dim
+        self.concat_dim = embed_dim + (num_codebooks * embed_dim)
 
         self.emb_dropout = nn.Dropout(dropout)
 
-        # 3. HSTU Blocks
+        self.fi = FeatureInteractionBlock(4*embed_dim, embed_dim, dropout)  # 🌟 新增：交互融合网络块
+
+
+        # 🌟 核心修改 2：HSTU 块使用拼接后的总维度 (concat_dim)
+        # 🌟 修改点：HSTU 块的参数传递适配 RoPE
         self.layers = nn.ModuleList([
             HSTULayer(
-                embed_dim=embed_dim, num_heads=num_heads, dropout=dropout,
-                num_position_buckets=num_position_buckets, num_time_buckets=num_time_buckets,
-                max_position_distance=max_position_distance, use_temporal_bias=use_temporal_bias,
+                embed_dim=self.concat_dim,  
+                num_heads=num_heads, dropout=dropout,
+                max_seq_len=max_seq_len, # <-- 传入最大序列长度给 RoPE
+                num_time_buckets=num_time_buckets,
+                use_temporal_bias=use_temporal_bias,
             )
             for _ in range(num_blocks)
         ])
 
-        self.final_norm = nn.LayerNorm(embed_dim)
+        # 🌟 核心修改 3：最后的 LayerNorm 也要对应总维度
+        self.final_norm = nn.LayerNorm(self.concat_dim)
         self._init_weights()
 
+    # ... _init_weights 保持不变 ...
     def _init_weights(self):
         for module in self.modules():
             if isinstance(module, nn.Linear):
@@ -130,63 +244,61 @@ class HMSR_HSTU(nn.Module):
 
     def get_fused_item_embeddings(self, item_ids: torch.Tensor) -> torch.Tensor:
         """
-        核心机制：动态提取任意 item_ids 的 [传统ID嵌入 + 语义嵌入]
+        动态提取并拼接： [传统ID嵌入 + 3个语义嵌入]
         """
-        # 1. 基础 Item ID Embedding
-        id_embs = self.item_embedding(item_ids) # [..., D]
+        # [..., D]
+        id_embs = self.item_embedding(item_ids) 
         
-        # 2. 查表获取 Semantic IDs
-        
-        sem_ids = self.item_semantic_map[item_ids] # [..., 3]
-        
-        # 3. 动态生成 Token Type IDs (0, 1, 2)
+        sem_ids = self.item_semantic_map[item_ids] 
         type_ids = torch.arange(self.num_codebooks, device=item_ids.device).expand_as(sem_ids)
         
-        # 4. 获取语义 Embedding
-        sem_embs = self.semantic_fusion(sem_ids, type_ids) # [..., D]
+        # [..., 3 * D]
+        sem_embs = self.semantic_fusion(sem_ids, type_ids) 
         
-        # 🌟 强强联手：融合
-        return id_embs + sem_embs
+        # 🌟 核心修改：在最后一个维度拼接 -> [..., 4 * D]
+        return torch.cat([id_embs, sem_embs], dim=-1)
 
     def forward(
         self,
-        input_item_ids: torch.Tensor,       # [B, L]
-        history_sid: torch.Tensor,          # [B, L*3] (来自 hmsr_collate_fn)
-        token_type_ids: torch.Tensor,       # [B, L*3] (来自 hmsr_collate_fn)
+        input_item_ids: torch.Tensor,       
+        history_sid: torch.Tensor,          
+        token_type_ids: torch.Tensor,       
         timestamps: Optional[torch.Tensor] = None, 
-        targets: Optional[torch.Tensor] = None, # 这里指 target_item_ids [B, L]
+        targets: Optional[torch.Tensor] = None, 
     ) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
         
         B, L = input_item_ids.shape
         device = input_item_ids.device
 
-        # Mask 生成
         causal_mask = torch.triu(torch.ones(L, L, device=device), diagonal=1).bool()
         padding_mask = (input_item_ids == 0)
 
-        # === 🌟 历史特征双轨融合 ===
-        # 1. 处理 Item ID
+        # 1. Item ID 特征 [B, L, D]
         x_id = self.item_embedding(input_item_ids)
         
-        # 2. 处理 Semantic ID (将 [B, L*3] 转换为 [B, L, 3] 后送入语义层)
+        # 2. Semantic ID 特征 [B, L, 3D]
         sem_ids_3d = history_sid.view(B, L, self.num_codebooks)
         type_ids_3d = token_type_ids.view(B, L, self.num_codebooks)
         x_sem = self.semantic_fusion(sem_ids_3d, type_ids_3d)
 
-        # 3. 相加融合
-        x = self.emb_dropout(x_id + x_sem)
+        # 3. 🌟 拼接融合 -> [B, L, 4D]
+        x = self.emb_dropout(torch.cat([x_id, x_sem], dim=-1))
+        
+        x = self.fi(x)
+        
 
-        # === 穿过 HSTU 层 ===
+        # 穿过 HSTU 层 (HSTU 现在内部维度是 4D)
         for layer in self.layers:
             x = layer(x, causal_mask, padding_mask, timestamps)
-
-        x = self.final_norm(x) # [B, L, D]
-
-        # === 🌟 预测打分层 (Prediction) ===
-        # 我们需要用全量物品的【融合特征】来算 Logits，而不是光光用 item_embedding
-        all_item_ids = torch.arange(self.num_items + 1, device=device)
-        all_fused_embs = self.get_fused_item_embeddings(all_item_ids) # [V, D]
         
+        x = self.final_norm(x) # [B, L, 4D]
+
+        # 预测打分：用全量物品的【拼接特征】来算 Logits，维度完美匹配 4D @ 4D.T
+        all_item_ids = torch.arange(self.num_items + 1, device=device)
+        all_fused_embs = self.get_fused_item_embeddings(all_item_ids) # [V, 4D]
+        
+        
+
         logits = x @ all_fused_embs.T  # [B, L, V]
 
         loss = None
@@ -205,40 +317,39 @@ class HMSR_HSTU(nn.Module):
         history_sid: torch.Tensor,
         token_type_ids: torch.Tensor,
         timestamps: Optional[torch.Tensor] = None,
-        targets: Optional[torch.Tensor] = None, # [B, L]
+        targets: Optional[torch.Tensor] = None, 
         num_negatives: int = 128,
         temperature: float = 0.05,
     ) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
-        """
-        带负采样的训练模式 (针对混合语义架构进行了重构)
-        """
+        
         B, L = input_item_ids.shape
         device = input_item_ids.device
 
         causal_mask = torch.triu(torch.ones(L, L, device=device), diagonal=1).bool()
         padding_mask = (input_item_ids == 0)
 
-        # 融合前向
+        # 提取并拼接特征
         x_id = self.item_embedding(input_item_ids)
         sem_ids_3d = history_sid.view(B, L, self.num_codebooks)
         type_ids_3d = token_type_ids.view(B, L, self.num_codebooks)
         x_sem = self.semantic_fusion(sem_ids_3d, type_ids_3d)
         
-        x = self.emb_dropout(x_id + x_sem)
+        # 🌟 拼接
+        x = self.emb_dropout(torch.cat([x_id, x_sem], dim=-1))
 
         for layer in self.layers:
             x = layer(x, causal_mask, padding_mask, timestamps)
 
-        x = self.final_norm(x) # [B, L, D]
+        x = self.final_norm(x) # [B, L, 4D]
         
-        # 评估用 Full Logits
         all_item_ids = torch.arange(self.num_items + 1, device=device)
         all_fused_embs = self.get_fused_item_embeddings(all_item_ids)
         logits = x @ all_fused_embs.T
 
         loss = None
         if targets is not None:
-            x_flat = x.view(-1, self.embed_dim)
+            # 修改 view 的维度为 self.concat_dim
+            x_flat = x.view(-1, self.concat_dim)
             targets_flat = targets.view(-1)
 
             valid_mask = targets_flat != 0
@@ -246,10 +357,8 @@ class HMSR_HSTU(nn.Module):
             targets_valid = targets_flat[valid_mask]
 
             if x_valid.size(0) > 0:
-                # 🌟 获取正样本的融合 Embedding
                 pos_emb = self.get_fused_item_embeddings(targets_valid)
 
-                # 🌟 获取负样本的融合 Embedding (采样后动态拼接语义)
                 neg_ids = torch.randint(1, self.num_items + 1, (num_negatives,), device=device)
                 neg_emb = self.get_fused_item_embeddings(neg_ids)
 
@@ -270,22 +379,15 @@ class HMSR_HSTU(nn.Module):
 
 class HSTULayer(nn.Module):
     """
-    Single HSTU layer.
-
-    Structure:
-        1. Pointwise Projection: X -> SiLU(Linear(X)) -> split to U, V, Q, K
-        2. Spatial Aggregation: SiLU(QK^T + RAB) @ V
-        3. Pointwise Transformation: Norm(Attention) ⊙ U -> FFN
+    带有 RoPE (旋转位置编码) 的 HSTU layer.
     """
-
     def __init__(
         self,
         embed_dim: int,
         num_heads: int,
         dropout: float,
-        num_position_buckets: int,
+        max_seq_len: int,          # 🌟 替换了原有的 num_position_buckets 和 max_position_distance
         num_time_buckets: int,
-        max_position_distance: int,
         use_temporal_bias: bool,
     ):
         super().__init__()
@@ -295,28 +397,23 @@ class HSTULayer(nn.Module):
         self.use_temporal_bias = use_temporal_bias
 
         assert embed_dim % num_heads == 0
+        assert self.head_dim % 2 == 0, "RoPE requires head_dim to be even" # RoPE的限制条件
 
         # Pointwise projection: projects to 4 * embed_dim (for U, V, Q, K)
         self.projection = nn.Linear(embed_dim, 4 * embed_dim)
 
-        # Relative attention bias (position-based, shared across heads)
-        self.position_bias = RelativePositionBias(
-            num_buckets=num_position_buckets,
-            max_distance=max_position_distance,
-            num_heads=num_heads,
-        )
+        # 🌟 引入旋转位置编码器
+        self.rotary_emb = RotaryEmbedding(self.head_dim, max_seq_len=max_seq_len)
 
-        # Temporal bias (optional)
+        # Temporal bias (保留，用于真实时间差)
         if use_temporal_bias:
             self.temporal_bias = TemporalBias(
                 num_buckets=num_time_buckets,
                 num_heads=num_heads,
             )
 
-        # Layer norm for attention output
         self.attn_norm = nn.LayerNorm(embed_dim)
 
-        # FFN (pointwise transformation)
         self.ffn = nn.Sequential(
             nn.Linear(embed_dim, 4 * embed_dim),
             nn.SiLU(),
@@ -325,22 +422,19 @@ class HSTULayer(nn.Module):
             nn.Dropout(dropout),
         )
 
-        # Final layer norm
         self.ffn_norm = nn.LayerNorm(embed_dim)
-
         self.dropout = nn.Dropout(dropout)
 
     def forward(
         self,
-        x: torch.Tensor,  # [B, L, D]
-        causal_mask: torch.Tensor,  # [L, L]
-        padding_mask: torch.Tensor,  # [B, L]
-        timestamps: Optional[torch.Tensor] = None,  # [B, L]
+        x: torch.Tensor,  
+        causal_mask: torch.Tensor,  
+        padding_mask: torch.Tensor,  
+        timestamps: Optional[torch.Tensor] = None,  
     ) -> torch.Tensor:
         B, L, D = x.shape
         residual = x
 
-        # === Pointwise Projection ===
         projected = F.silu(self.projection(x))  # [B, L, 4D]
         U, V, Q, K = projected.chunk(4, dim=-1)  # Each [B, L, D]
 
@@ -348,39 +442,35 @@ class HSTULayer(nn.Module):
         K = K.view(B, L, self.num_heads, self.head_dim).transpose(1, 2)
         V = V.view(B, L, self.num_heads, self.head_dim).transpose(1, 2)
 
+        # === 🌟 应用旋转位置编码 (RoPE) ===
+        cos, sin = self.rotary_emb(V, seq_len=L)
+        Q, K = apply_rotary_pos_emb(Q, K, cos, sin)
+        # ==================================
+
         # === Spatial Aggregation ===
-        # 🚨 必须修复 1: 增加缩放因子，防止梯度爆炸！
         scores = (Q @ K.transpose(-2, -1)) / math.sqrt(self.head_dim)
 
-        pos_bias = self.position_bias(L, x.device)  
-        scores = scores + pos_bias.unsqueeze(0)
+        # 🌟 注：原有的 relative pos bias 偏置相加已被移除
 
         if self.use_temporal_bias and timestamps is not None:
             time_bias = self.temporal_bias(timestamps)
             scores = scores + time_bias
 
-        # 🚨 必须修复 2: 先过 SiLU 激活函数！
         attn_weights = F.silu(scores)
 
-        # 🚨 必须修复 3: 激活后再将无效位置（Padding和未来信息）精确 Mask 为 0.0！
         attn_weights = attn_weights.masked_fill(causal_mask.unsqueeze(0).unsqueeze(0), 0.0)
         attn_weights = attn_weights.masked_fill(padding_mask.unsqueeze(1).unsqueeze(2), 0.0)
 
         attn_output = attn_weights @ V  # [B, H, L, d]
         attn_output = attn_output.transpose(1, 2).contiguous().view(B, L, D)  
 
-        # === Pointwise Transformation ===
         attn_output = self.attn_norm(attn_output)
-        attn_output = attn_output * U  # Element-wise gating
+        attn_output = attn_output * U  
 
-        # Residual connection
         x = residual + self.dropout(attn_output)
-
-        # FFN with residual
         x = x + self.ffn(self.ffn_norm(x))
 
         return x
-
 
 class RelativePositionBias(nn.Module):
     """
@@ -481,8 +571,9 @@ class TemporalBias(nn.Module):
         # Paper uses: floor(log(max(1, |diff|)) / 0.301)
         # We use a similar approach but cap at num_buckets - 1
         buckets = (torch.log(abs_diff) / 0.693).long()  # 0.693 = ln(2)
-        buckets = torch.clamp(buckets, min=0, max=self.num_buckets - 1)
 
+        buckets = torch.clamp(buckets, min=0, max=self.num_buckets - 1)
+   
         return buckets
 
     def forward(self, timestamps: torch.Tensor) -> torch.Tensor:
@@ -503,7 +594,8 @@ class TemporalBias(nn.Module):
 
         # Convert to buckets
         buckets = self._temporal_bucket(time_diff)  # [B, L, L]
-
+        #print("Temporal buckets:", buckets)  # Debug: 输出桶的形状
+        
         # Look up bias values
         bias = self.temporal_attention_bias(buckets)  # [B, L, L, H]
         bias = bias.permute(0, 3, 1, 2)  # [B, H, L, L]

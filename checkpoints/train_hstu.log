@@ -901,3 +901,762 @@
   - Recall@5: 0.0654 | NDCG@5: 0.0445
   - Recall@10: 0.0943 | NDCG@10: 0.0539
 2026-04-25 14:28:01,849 - INFO - Training completed!
+2026-04-26 10:54:53,258 - INFO - Training arguments: Namespace(dataset='beauty', root='../genrec/dataset/amazon', use_sampled_softmax=False, embed_dim=64, num_heads=2, num_blocks=2, dropout=0.2, max_seq_len=50, num_position_buckets=32, num_time_buckets=64, max_position_distance=128, use_temporal_bias=False, batch_size=128, epochs=100, lr=0.005, weight_decay=0.0, patience=50, device='cuda', checkpoint_dir='./checkpoints', eval_k=10)
+2026-04-26 10:54:53,272 - INFO - Loading datasets...
+2026-04-26 10:55:09,207 - INFO - Number of items: 12101
+2026-04-26 10:55:09,208 - INFO - Train samples: 22363
+2026-04-26 10:55:09,208 - INFO - Valid samples: 22363
+2026-04-26 10:55:09,208 - INFO - Test samples: 22363
+2026-04-26 10:55:09,208 - INFO - Initializing HMSR-HSTU model...
+2026-04-26 10:55:09,209 - INFO - ⚠️ 检测到 semantic_map 缺少第 0 行 (Padding)，正在自动补零对齐...
+2026-04-26 10:55:09,209 - INFO - 最终 item_semantic_map 维度: torch.Size([12102, 3])
+2026-04-26 10:55:09,411 - INFO - Model parameters: 1000448
+2026-04-26 10:55:12,680 - INFO - Starting training...
+2026-04-26 10:55:20,164 - INFO - Epoch 01/100 | Train Loss: 9.2541 | Val Recall@5: 0.0075 | Val NDCG@5: 0.0042 | Val Recall@10: 0.0142 | Val NDCG@10: 0.0063
+2026-04-26 10:55:20,243 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0063
+2026-04-26 10:55:26,964 - INFO - Epoch 02/100 | Train Loss: 8.7925 | Val Recall@5: 0.0103 | Val NDCG@5: 0.0062 | Val Recall@10: 0.0178 | Val NDCG@10: 0.0086
+2026-04-26 10:55:27,094 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0086
+2026-04-26 10:55:33,731 - INFO - Epoch 03/100 | Train Loss: 8.3142 | Val Recall@5: 0.0224 | Val NDCG@5: 0.0142 | Val Recall@10: 0.0377 | Val NDCG@10: 0.0192
+2026-04-26 10:55:33,814 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0192
+2026-04-26 10:55:40,441 - INFO - Epoch 04/100 | Train Loss: 7.8825 | Val Recall@5: 0.0292 | Val NDCG@5: 0.0188 | Val Recall@10: 0.0463 | Val NDCG@10: 0.0243
+2026-04-26 10:55:40,546 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0243
+2026-04-26 10:55:47,125 - INFO - Epoch 05/100 | Train Loss: 7.6066 | Val Recall@5: 0.0362 | Val NDCG@5: 0.0242 | Val Recall@10: 0.0587 | Val NDCG@10: 0.0314
+2026-04-26 10:55:47,258 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0314
+2026-04-26 10:55:52,826 - INFO - Epoch 06/100 | Train Loss: 7.3612 | Val Recall@5: 0.0420 | Val NDCG@5: 0.0280 | Val Recall@10: 0.0648 | Val NDCG@10: 0.0354
+2026-04-26 10:55:52,894 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0354
+2026-04-26 10:55:58,842 - INFO - Epoch 07/100 | Train Loss: 7.0904 | Val Recall@5: 0.0470 | Val NDCG@5: 0.0313 | Val Recall@10: 0.0697 | Val NDCG@10: 0.0387
+2026-04-26 10:55:58,972 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0387
+2026-04-26 10:56:05,041 - INFO - Epoch 08/100 | Train Loss: 6.8009 | Val Recall@5: 0.0482 | Val NDCG@5: 0.0324 | Val Recall@10: 0.0709 | Val NDCG@10: 0.0397
+2026-04-26 10:56:05,173 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0397
+2026-04-26 10:56:11,366 - INFO - Epoch 09/100 | Train Loss: 6.5350 | Val Recall@5: 0.0495 | Val NDCG@5: 0.0335 | Val Recall@10: 0.0762 | Val NDCG@10: 0.0421
+2026-04-26 10:56:11,452 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0421
+2026-04-26 10:56:17,389 - INFO - Epoch 10/100 | Train Loss: 6.3191 | Val Recall@5: 0.0515 | Val NDCG@5: 0.0333 | Val Recall@10: 0.0758 | Val NDCG@10: 0.0411
+2026-04-26 10:56:23,421 - INFO - Epoch 11/100 | Train Loss: 6.1484 | Val Recall@5: 0.0511 | Val NDCG@5: 0.0334 | Val Recall@10: 0.0753 | Val NDCG@10: 0.0412
+2026-04-26 10:56:29,253 - INFO - Epoch 12/100 | Train Loss: 6.0158 | Val Recall@5: 0.0495 | Val NDCG@5: 0.0335 | Val Recall@10: 0.0736 | Val NDCG@10: 0.0412
+2026-04-26 10:56:35,576 - INFO - Epoch 13/100 | Train Loss: 5.9024 | Val Recall@5: 0.0531 | Val NDCG@5: 0.0357 | Val Recall@10: 0.0761 | Val NDCG@10: 0.0431
+2026-04-26 10:56:35,711 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0431
+2026-04-26 10:56:41,759 - INFO - Epoch 14/100 | Train Loss: 5.8076 | Val Recall@5: 0.0532 | Val NDCG@5: 0.0351 | Val Recall@10: 0.0767 | Val NDCG@10: 0.0427
+2026-04-26 10:56:47,751 - INFO - Epoch 15/100 | Train Loss: 5.7233 | Val Recall@5: 0.0514 | Val NDCG@5: 0.0351 | Val Recall@10: 0.0755 | Val NDCG@10: 0.0429
+2026-04-26 10:56:53,938 - INFO - Epoch 16/100 | Train Loss: 5.6501 | Val Recall@5: 0.0517 | Val NDCG@5: 0.0353 | Val Recall@10: 0.0736 | Val NDCG@10: 0.0423
+2026-04-26 10:57:15,974 - INFO - Training arguments: Namespace(dataset='beauty', root='../genrec/dataset/amazon', use_sampled_softmax=False, embed_dim=64, num_heads=2, num_blocks=2, dropout=0.2, max_seq_len=50, num_position_buckets=32, num_time_buckets=64, max_position_distance=128, use_temporal_bias=False, batch_size=128, epochs=100, lr=0.005, weight_decay=0.0, patience=50, device='cuda', checkpoint_dir='./checkpoints', eval_k=10)
+2026-04-26 10:57:15,974 - INFO - Loading datasets...
+2026-04-26 10:57:31,325 - INFO - Number of items: 12101
+2026-04-26 10:57:31,325 - INFO - Train samples: 22363
+2026-04-26 10:57:31,325 - INFO - Valid samples: 22363
+2026-04-26 10:57:31,325 - INFO - Test samples: 22363
+2026-04-26 10:57:31,325 - INFO - Initializing HMSR-HSTU model...
+2026-04-26 10:57:31,326 - INFO - ⚠️ 检测到 semantic_map 缺少第 0 行 (Padding)，正在自动补零对齐...
+2026-04-26 10:57:31,326 - INFO - 最终 item_semantic_map 维度: torch.Size([12102, 3])
+2026-04-26 10:57:31,343 - INFO - Model parameters: 1000448
+2026-04-26 10:57:32,131 - INFO - Starting training...
+2026-04-26 10:59:54,646 - INFO - Training arguments: Namespace(dataset='beauty', root='../genrec/dataset/amazon', use_sampled_softmax=False, embed_dim=64, num_heads=2, num_blocks=2, dropout=0.2, max_seq_len=50, num_position_buckets=32, num_time_buckets=64, max_position_distance=128, use_temporal_bias=False, batch_size=128, epochs=100, lr=0.005, weight_decay=0.0, patience=50, device='cuda', checkpoint_dir='./checkpoints', eval_k=10)
+2026-04-26 10:59:54,646 - INFO - Loading datasets...
+2026-04-26 11:00:09,702 - INFO - Number of items: 12101
+2026-04-26 11:00:09,702 - INFO - Train samples: 22363
+2026-04-26 11:00:09,702 - INFO - Valid samples: 22363
+2026-04-26 11:00:09,702 - INFO - Test samples: 22363
+2026-04-26 11:00:09,702 - INFO - Initializing HMSR-HSTU model...
+2026-04-26 11:00:09,702 - INFO - ⚠️ 检测到 semantic_map 缺少第 0 行 (Padding)，正在自动补零对齐...
+2026-04-26 11:00:09,703 - INFO - 最终 item_semantic_map 维度: torch.Size([12102, 3])
+2026-04-26 11:00:09,747 - INFO - Model parameters: 2467904
+2026-04-26 11:00:10,543 - INFO - Starting training...
+2026-04-26 11:00:17,396 - INFO - Epoch 01/100 | Train Loss: 8.4025 | Val Recall@5: 0.0241 | Val NDCG@5: 0.0155 | Val Recall@10: 0.0420 | Val NDCG@10: 0.0212
+2026-04-26 11:00:17,476 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0212
+2026-04-26 11:00:23,986 - INFO - Epoch 02/100 | Train Loss: 7.7527 | Val Recall@5: 0.0315 | Val NDCG@5: 0.0211 | Val Recall@10: 0.0511 | Val NDCG@10: 0.0274
+2026-04-26 11:00:24,058 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0274
+2026-04-26 11:00:30,712 - INFO - Epoch 03/100 | Train Loss: 7.4683 | Val Recall@5: 0.0390 | Val NDCG@5: 0.0263 | Val Recall@10: 0.0612 | Val NDCG@10: 0.0334
+2026-04-26 11:00:30,785 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0334
+2026-04-26 11:00:36,863 - INFO - Epoch 04/100 | Train Loss: 7.2413 | Val Recall@5: 0.0464 | Val NDCG@5: 0.0317 | Val Recall@10: 0.0686 | Val NDCG@10: 0.0388
+2026-04-26 11:00:36,936 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0388
+2026-04-26 11:00:43,283 - INFO - Epoch 05/100 | Train Loss: 7.0191 | Val Recall@5: 0.0468 | Val NDCG@5: 0.0319 | Val Recall@10: 0.0703 | Val NDCG@10: 0.0395
+2026-04-26 11:00:43,360 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0395
+2026-04-26 11:00:49,560 - INFO - Epoch 06/100 | Train Loss: 6.8098 | Val Recall@5: 0.0493 | Val NDCG@5: 0.0341 | Val Recall@10: 0.0725 | Val NDCG@10: 0.0415
+2026-04-26 11:00:49,636 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0415
+2026-04-26 11:00:55,770 - INFO - Epoch 07/100 | Train Loss: 6.6112 | Val Recall@5: 0.0482 | Val NDCG@5: 0.0335 | Val Recall@10: 0.0723 | Val NDCG@10: 0.0412
+2026-04-26 11:01:02,281 - INFO - Epoch 08/100 | Train Loss: 6.4210 | Val Recall@5: 0.0520 | Val NDCG@5: 0.0374 | Val Recall@10: 0.0739 | Val NDCG@10: 0.0444
+2026-04-26 11:01:02,356 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0444
+2026-04-26 11:01:08,493 - INFO - Epoch 09/100 | Train Loss: 6.2466 | Val Recall@5: 0.0496 | Val NDCG@5: 0.0352 | Val Recall@10: 0.0723 | Val NDCG@10: 0.0425
+2026-04-26 11:01:14,587 - INFO - Epoch 10/100 | Train Loss: 6.0932 | Val Recall@5: 0.0528 | Val NDCG@5: 0.0370 | Val Recall@10: 0.0737 | Val NDCG@10: 0.0438
+2026-04-26 11:01:21,199 - INFO - Epoch 11/100 | Train Loss: 5.9509 | Val Recall@5: 0.0517 | Val NDCG@5: 0.0372 | Val Recall@10: 0.0747 | Val NDCG@10: 0.0446
+2026-04-26 11:01:21,272 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0446
+2026-04-26 11:01:27,748 - INFO - Epoch 12/100 | Train Loss: 5.8181 | Val Recall@5: 0.0516 | Val NDCG@5: 0.0370 | Val Recall@10: 0.0745 | Val NDCG@10: 0.0444
+2026-04-26 11:01:33,994 - INFO - Epoch 13/100 | Train Loss: 5.7020 | Val Recall@5: 0.0525 | Val NDCG@5: 0.0377 | Val Recall@10: 0.0717 | Val NDCG@10: 0.0439
+2026-04-26 11:01:40,309 - INFO - Epoch 14/100 | Train Loss: 5.5932 | Val Recall@5: 0.0525 | Val NDCG@5: 0.0370 | Val Recall@10: 0.0732 | Val NDCG@10: 0.0436
+2026-04-26 11:01:46,348 - INFO - Epoch 15/100 | Train Loss: 5.4963 | Val Recall@5: 0.0521 | Val NDCG@5: 0.0377 | Val Recall@10: 0.0716 | Val NDCG@10: 0.0440
+2026-04-26 11:01:52,424 - INFO - Epoch 16/100 | Train Loss: 5.4132 | Val Recall@5: 0.0516 | Val NDCG@5: 0.0378 | Val Recall@10: 0.0715 | Val NDCG@10: 0.0441
+2026-04-26 11:01:58,380 - INFO - Epoch 17/100 | Train Loss: 5.3297 | Val Recall@5: 0.0515 | Val NDCG@5: 0.0373 | Val Recall@10: 0.0721 | Val NDCG@10: 0.0440
+2026-04-26 11:02:04,467 - INFO - Epoch 18/100 | Train Loss: 5.2575 | Val Recall@5: 0.0518 | Val NDCG@5: 0.0380 | Val Recall@10: 0.0729 | Val NDCG@10: 0.0448
+2026-04-26 11:02:04,544 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0448
+2026-04-26 11:02:10,682 - INFO - Epoch 19/100 | Train Loss: 5.1830 | Val Recall@5: 0.0513 | Val NDCG@5: 0.0370 | Val Recall@10: 0.0714 | Val NDCG@10: 0.0435
+2026-04-26 11:02:16,610 - INFO - Epoch 20/100 | Train Loss: 5.1143 | Val Recall@5: 0.0502 | Val NDCG@5: 0.0366 | Val Recall@10: 0.0691 | Val NDCG@10: 0.0427
+2026-04-26 11:02:22,852 - INFO - Epoch 21/100 | Train Loss: 5.0543 | Val Recall@5: 0.0512 | Val NDCG@5: 0.0367 | Val Recall@10: 0.0719 | Val NDCG@10: 0.0434
+2026-04-26 11:02:29,165 - INFO - Epoch 22/100 | Train Loss: 5.0057 | Val Recall@5: 0.0525 | Val NDCG@5: 0.0379 | Val Recall@10: 0.0711 | Val NDCG@10: 0.0438
+2026-04-26 11:02:35,094 - INFO - Epoch 23/100 | Train Loss: 4.9496 | Val Recall@5: 0.0517 | Val NDCG@5: 0.0371 | Val Recall@10: 0.0712 | Val NDCG@10: 0.0433
+2026-04-26 11:02:41,453 - INFO - Epoch 24/100 | Train Loss: 4.9075 | Val Recall@5: 0.0504 | Val NDCG@5: 0.0369 | Val Recall@10: 0.0705 | Val NDCG@10: 0.0433
+2026-04-26 11:02:47,506 - INFO - Epoch 25/100 | Train Loss: 4.8573 | Val Recall@5: 0.0512 | Val NDCG@5: 0.0375 | Val Recall@10: 0.0711 | Val NDCG@10: 0.0440
+2026-04-26 11:02:54,076 - INFO - Epoch 26/100 | Train Loss: 4.8225 | Val Recall@5: 0.0512 | Val NDCG@5: 0.0364 | Val Recall@10: 0.0699 | Val NDCG@10: 0.0424
+2026-04-26 11:03:00,431 - INFO - Epoch 27/100 | Train Loss: 4.7824 | Val Recall@5: 0.0509 | Val NDCG@5: 0.0366 | Val Recall@10: 0.0698 | Val NDCG@10: 0.0426
+2026-04-26 11:03:06,596 - INFO - Epoch 28/100 | Train Loss: 4.7419 | Val Recall@5: 0.0513 | Val NDCG@5: 0.0368 | Val Recall@10: 0.0692 | Val NDCG@10: 0.0426
+2026-04-26 11:03:12,689 - INFO - Epoch 29/100 | Train Loss: 4.7105 | Val Recall@5: 0.0508 | Val NDCG@5: 0.0364 | Val Recall@10: 0.0689 | Val NDCG@10: 0.0422
+2026-04-26 11:03:19,184 - INFO - Epoch 30/100 | Train Loss: 4.6700 | Val Recall@5: 0.0508 | Val NDCG@5: 0.0373 | Val Recall@10: 0.0703 | Val NDCG@10: 0.0436
+2026-04-26 11:03:25,272 - INFO - Epoch 31/100 | Train Loss: 4.6480 | Val Recall@5: 0.0489 | Val NDCG@5: 0.0357 | Val Recall@10: 0.0692 | Val NDCG@10: 0.0422
+2026-04-26 11:03:31,595 - INFO - Epoch 32/100 | Train Loss: 4.6129 | Val Recall@5: 0.0500 | Val NDCG@5: 0.0362 | Val Recall@10: 0.0697 | Val NDCG@10: 0.0425
+2026-04-26 11:04:10,264 - INFO - Training arguments: Namespace(dataset='beauty', root='../genrec/dataset/amazon', use_sampled_softmax=False, embed_dim=32, num_heads=2, num_blocks=2, dropout=0.2, max_seq_len=50, num_position_buckets=32, num_time_buckets=64, max_position_distance=128, use_temporal_bias=False, batch_size=128, epochs=100, lr=0.005, weight_decay=0.0, patience=50, device='cuda', checkpoint_dir='./checkpoints', eval_k=10)
+2026-04-26 11:04:10,264 - INFO - Loading datasets...
+2026-04-26 11:04:25,448 - INFO - Number of items: 12101
+2026-04-26 11:04:25,449 - INFO - Train samples: 22363
+2026-04-26 11:04:25,449 - INFO - Valid samples: 22363
+2026-04-26 11:04:25,449 - INFO - Test samples: 22363
+2026-04-26 11:04:25,449 - INFO - Initializing HMSR-HSTU model...
+2026-04-26 11:04:25,449 - INFO - ⚠️ 检测到 semantic_map 缺少第 0 行 (Padding)，正在自动补零对齐...
+2026-04-26 11:04:25,450 - INFO - 最终 item_semantic_map 维度: torch.Size([12102, 3])
+2026-04-26 11:04:25,465 - INFO - Model parameters: 840800
+2026-04-26 11:04:26,255 - INFO - Starting training...
+2026-04-26 11:04:33,053 - INFO - Epoch 01/100 | Train Loss: 8.4753 | Val Recall@5: 0.0221 | Val NDCG@5: 0.0138 | Val Recall@10: 0.0390 | Val NDCG@10: 0.0192
+2026-04-26 11:04:33,095 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0192
+2026-04-26 11:04:39,151 - INFO - Epoch 02/100 | Train Loss: 7.8306 | Val Recall@5: 0.0305 | Val NDCG@5: 0.0197 | Val Recall@10: 0.0511 | Val NDCG@10: 0.0263
+2026-04-26 11:04:39,192 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0263
+2026-04-26 11:04:45,418 - INFO - Epoch 03/100 | Train Loss: 7.6049 | Val Recall@5: 0.0358 | Val NDCG@5: 0.0238 | Val Recall@10: 0.0565 | Val NDCG@10: 0.0304
+2026-04-26 11:04:45,457 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0304
+2026-04-26 11:04:51,341 - INFO - Epoch 04/100 | Train Loss: 7.4271 | Val Recall@5: 0.0378 | Val NDCG@5: 0.0250 | Val Recall@10: 0.0594 | Val NDCG@10: 0.0320
+2026-04-26 11:04:51,381 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0320
+2026-04-26 11:04:57,314 - INFO - Epoch 05/100 | Train Loss: 7.2782 | Val Recall@5: 0.0427 | Val NDCG@5: 0.0285 | Val Recall@10: 0.0649 | Val NDCG@10: 0.0356
+2026-04-26 11:04:57,362 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0356
+2026-04-26 11:05:03,383 - INFO - Epoch 06/100 | Train Loss: 7.1407 | Val Recall@5: 0.0443 | Val NDCG@5: 0.0298 | Val Recall@10: 0.0695 | Val NDCG@10: 0.0379
+2026-04-26 11:05:03,422 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0379
+2026-04-26 11:05:09,812 - INFO - Epoch 07/100 | Train Loss: 7.0236 | Val Recall@5: 0.0462 | Val NDCG@5: 0.0318 | Val Recall@10: 0.0711 | Val NDCG@10: 0.0398
+2026-04-26 11:05:09,852 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0398
+2026-04-26 11:05:16,263 - INFO - Epoch 08/100 | Train Loss: 6.9199 | Val Recall@5: 0.0478 | Val NDCG@5: 0.0332 | Val Recall@10: 0.0730 | Val NDCG@10: 0.0413
+2026-04-26 11:05:16,303 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0413
+2026-04-26 11:05:22,083 - INFO - Epoch 09/100 | Train Loss: 6.8260 | Val Recall@5: 0.0479 | Val NDCG@5: 0.0333 | Val Recall@10: 0.0724 | Val NDCG@10: 0.0412
+2026-04-26 11:05:27,832 - INFO - Epoch 10/100 | Train Loss: 6.7381 | Val Recall@5: 0.0489 | Val NDCG@5: 0.0340 | Val Recall@10: 0.0745 | Val NDCG@10: 0.0423
+2026-04-26 11:05:27,872 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0423
+2026-04-26 11:05:33,966 - INFO - Epoch 11/100 | Train Loss: 6.6676 | Val Recall@5: 0.0501 | Val NDCG@5: 0.0346 | Val Recall@10: 0.0779 | Val NDCG@10: 0.0435
+2026-04-26 11:05:34,007 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0435
+2026-04-26 11:05:39,930 - INFO - Epoch 12/100 | Train Loss: 6.6030 | Val Recall@5: 0.0503 | Val NDCG@5: 0.0342 | Val Recall@10: 0.0755 | Val NDCG@10: 0.0423
+2026-04-26 11:05:45,932 - INFO - Epoch 13/100 | Train Loss: 6.5407 | Val Recall@5: 0.0516 | Val NDCG@5: 0.0354 | Val Recall@10: 0.0766 | Val NDCG@10: 0.0434
+2026-04-26 11:05:51,423 - INFO - Epoch 14/100 | Train Loss: 6.4874 | Val Recall@5: 0.0529 | Val NDCG@5: 0.0365 | Val Recall@10: 0.0769 | Val NDCG@10: 0.0443
+2026-04-26 11:05:51,463 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0443
+2026-04-26 11:05:57,339 - INFO - Epoch 15/100 | Train Loss: 6.4343 | Val Recall@5: 0.0503 | Val NDCG@5: 0.0347 | Val Recall@10: 0.0750 | Val NDCG@10: 0.0426
+2026-04-26 11:06:03,467 - INFO - Epoch 16/100 | Train Loss: 6.3925 | Val Recall@5: 0.0502 | Val NDCG@5: 0.0348 | Val Recall@10: 0.0761 | Val NDCG@10: 0.0432
+2026-04-26 11:06:09,606 - INFO - Epoch 17/100 | Train Loss: 6.3478 | Val Recall@5: 0.0523 | Val NDCG@5: 0.0366 | Val Recall@10: 0.0763 | Val NDCG@10: 0.0443
+2026-04-26 11:06:09,645 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0443
+2026-04-26 11:06:18,212 - INFO - Training arguments: Namespace(dataset='beauty', root='../genrec/dataset/amazon', use_sampled_softmax=False, embed_dim=32, num_heads=2, num_blocks=2, dropout=0.2, max_seq_len=50, num_position_buckets=32, num_time_buckets=64, max_position_distance=128, use_temporal_bias=False, batch_size=128, epochs=100, lr=0.005, weight_decay=0.0, patience=50, device='cuda', checkpoint_dir='./checkpoints', eval_k=10)
+2026-04-26 11:06:18,212 - INFO - Loading datasets...
+2026-04-26 11:06:33,553 - INFO - Number of items: 12101
+2026-04-26 11:06:33,553 - INFO - Train samples: 22363
+2026-04-26 11:06:33,553 - INFO - Valid samples: 22363
+2026-04-26 11:06:33,553 - INFO - Test samples: 22363
+2026-04-26 11:06:33,553 - INFO - Initializing HMSR-HSTU model...
+2026-04-26 11:06:33,554 - INFO - ⚠️ 检测到 semantic_map 缺少第 0 行 (Padding)，正在自动补零对齐...
+2026-04-26 11:06:33,554 - INFO - 最终 item_semantic_map 维度: torch.Size([12102, 3])
+2026-04-26 11:06:33,573 - INFO - Model parameters: 857633
+2026-04-26 11:06:34,358 - INFO - Starting training...
+2026-04-26 11:06:42,537 - INFO - Epoch 01/100 | Train Loss: 8.5401 | Val Recall@5: 0.0202 | Val NDCG@5: 0.0123 | Val Recall@10: 0.0345 | Val NDCG@10: 0.0169
+2026-04-26 11:06:42,581 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0169
+2026-04-26 11:06:49,603 - INFO - Epoch 02/100 | Train Loss: 7.9197 | Val Recall@5: 0.0282 | Val NDCG@5: 0.0179 | Val Recall@10: 0.0463 | Val NDCG@10: 0.0237
+2026-04-26 11:06:49,645 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0237
+2026-04-26 11:06:56,734 - INFO - Epoch 03/100 | Train Loss: 7.7073 | Val Recall@5: 0.0289 | Val NDCG@5: 0.0183 | Val Recall@10: 0.0500 | Val NDCG@10: 0.0251
+2026-04-26 11:06:56,803 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0251
+2026-04-26 11:07:04,225 - INFO - Epoch 04/100 | Train Loss: 7.5248 | Val Recall@5: 0.0345 | Val NDCG@5: 0.0220 | Val Recall@10: 0.0571 | Val NDCG@10: 0.0293
+2026-04-26 11:07:04,274 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0293
+2026-04-26 11:07:11,369 - INFO - Epoch 05/100 | Train Loss: 7.3721 | Val Recall@5: 0.0389 | Val NDCG@5: 0.0259 | Val Recall@10: 0.0607 | Val NDCG@10: 0.0329
+2026-04-26 11:07:11,411 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0329
+2026-04-26 11:07:18,881 - INFO - Epoch 06/100 | Train Loss: 7.2378 | Val Recall@5: 0.0389 | Val NDCG@5: 0.0262 | Val Recall@10: 0.0618 | Val NDCG@10: 0.0335
+2026-04-26 11:07:18,922 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0335
+2026-04-26 11:07:26,046 - INFO - Epoch 07/100 | Train Loss: 7.1230 | Val Recall@5: 0.0421 | Val NDCG@5: 0.0280 | Val Recall@10: 0.0696 | Val NDCG@10: 0.0367
+2026-04-26 11:07:26,097 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0367
+2026-04-26 11:07:33,482 - INFO - Epoch 08/100 | Train Loss: 7.0086 | Val Recall@5: 0.0453 | Val NDCG@5: 0.0308 | Val Recall@10: 0.0743 | Val NDCG@10: 0.0401
+2026-04-26 11:07:33,524 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0401
+2026-04-26 11:07:40,696 - INFO - Epoch 09/100 | Train Loss: 6.9089 | Val Recall@5: 0.0494 | Val NDCG@5: 0.0323 | Val Recall@10: 0.0749 | Val NDCG@10: 0.0405
+2026-04-26 11:07:40,740 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0405
+2026-04-26 11:07:48,001 - INFO - Epoch 10/100 | Train Loss: 6.8203 | Val Recall@5: 0.0473 | Val NDCG@5: 0.0317 | Val Recall@10: 0.0730 | Val NDCG@10: 0.0399
+2026-04-26 11:07:55,216 - INFO - Epoch 11/100 | Train Loss: 6.7290 | Val Recall@5: 0.0485 | Val NDCG@5: 0.0327 | Val Recall@10: 0.0718 | Val NDCG@10: 0.0402
+2026-04-26 11:08:02,776 - INFO - Epoch 12/100 | Train Loss: 6.6440 | Val Recall@5: 0.0492 | Val NDCG@5: 0.0335 | Val Recall@10: 0.0732 | Val NDCG@10: 0.0412
+2026-04-26 11:08:02,821 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0412
+2026-04-26 11:08:10,227 - INFO - Epoch 13/100 | Train Loss: 6.5793 | Val Recall@5: 0.0511 | Val NDCG@5: 0.0352 | Val Recall@10: 0.0767 | Val NDCG@10: 0.0435
+2026-04-26 11:08:10,270 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0435
+2026-04-26 11:08:17,721 - INFO - Epoch 14/100 | Train Loss: 6.5123 | Val Recall@5: 0.0510 | Val NDCG@5: 0.0356 | Val Recall@10: 0.0772 | Val NDCG@10: 0.0440
+2026-04-26 11:08:17,762 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0440
+2026-04-26 11:08:25,184 - INFO - Epoch 15/100 | Train Loss: 6.4537 | Val Recall@5: 0.0531 | Val NDCG@5: 0.0366 | Val Recall@10: 0.0782 | Val NDCG@10: 0.0447
+2026-04-26 11:08:25,242 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0447
+2026-04-26 11:08:32,387 - INFO - Epoch 16/100 | Train Loss: 6.4006 | Val Recall@5: 0.0508 | Val NDCG@5: 0.0353 | Val Recall@10: 0.0769 | Val NDCG@10: 0.0437
+2026-04-26 11:08:39,756 - INFO - Epoch 17/100 | Train Loss: 6.3590 | Val Recall@5: 0.0493 | Val NDCG@5: 0.0343 | Val Recall@10: 0.0738 | Val NDCG@10: 0.0422
+2026-04-26 11:08:46,836 - INFO - Epoch 18/100 | Train Loss: 6.3147 | Val Recall@5: 0.0499 | Val NDCG@5: 0.0343 | Val Recall@10: 0.0762 | Val NDCG@10: 0.0427
+2026-04-26 11:08:53,836 - INFO - Epoch 19/100 | Train Loss: 6.2713 | Val Recall@5: 0.0511 | Val NDCG@5: 0.0352 | Val Recall@10: 0.0754 | Val NDCG@10: 0.0430
+2026-04-26 11:09:01,271 - INFO - Epoch 20/100 | Train Loss: 6.2284 | Val Recall@5: 0.0497 | Val NDCG@5: 0.0348 | Val Recall@10: 0.0760 | Val NDCG@10: 0.0433
+2026-04-26 11:09:08,319 - INFO - Epoch 21/100 | Train Loss: 6.1978 | Val Recall@5: 0.0507 | Val NDCG@5: 0.0350 | Val Recall@10: 0.0756 | Val NDCG@10: 0.0431
+2026-04-26 11:09:15,308 - INFO - Epoch 22/100 | Train Loss: 6.1669 | Val Recall@5: 0.0533 | Val NDCG@5: 0.0371 | Val Recall@10: 0.0759 | Val NDCG@10: 0.0444
+2026-04-26 11:09:22,099 - INFO - Epoch 23/100 | Train Loss: 6.1405 | Val Recall@5: 0.0515 | Val NDCG@5: 0.0361 | Val Recall@10: 0.0764 | Val NDCG@10: 0.0442
+2026-04-26 11:09:29,470 - INFO - Epoch 24/100 | Train Loss: 6.1123 | Val Recall@5: 0.0503 | Val NDCG@5: 0.0350 | Val Recall@10: 0.0750 | Val NDCG@10: 0.0430
+2026-04-26 11:09:36,510 - INFO - Epoch 25/100 | Train Loss: 6.0864 | Val Recall@5: 0.0509 | Val NDCG@5: 0.0354 | Val Recall@10: 0.0762 | Val NDCG@10: 0.0435
+2026-04-26 11:09:43,427 - INFO - Epoch 26/100 | Train Loss: 6.0580 | Val Recall@5: 0.0511 | Val NDCG@5: 0.0360 | Val Recall@10: 0.0748 | Val NDCG@10: 0.0437
+2026-04-26 11:09:50,478 - INFO - Epoch 27/100 | Train Loss: 6.0392 | Val Recall@5: 0.0505 | Val NDCG@5: 0.0357 | Val Recall@10: 0.0757 | Val NDCG@10: 0.0438
+2026-04-26 11:09:57,530 - INFO - Epoch 28/100 | Train Loss: 6.0252 | Val Recall@5: 0.0528 | Val NDCG@5: 0.0365 | Val Recall@10: 0.0765 | Val NDCG@10: 0.0441
+2026-04-26 11:10:04,552 - INFO - Epoch 29/100 | Train Loss: 6.0063 | Val Recall@5: 0.0511 | Val NDCG@5: 0.0358 | Val Recall@10: 0.0765 | Val NDCG@10: 0.0440
+2026-04-26 11:10:11,508 - INFO - Epoch 30/100 | Train Loss: 5.9767 | Val Recall@5: 0.0528 | Val NDCG@5: 0.0373 | Val Recall@10: 0.0772 | Val NDCG@10: 0.0451
+2026-04-26 11:10:11,549 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0451
+2026-04-26 11:10:18,502 - INFO - Epoch 31/100 | Train Loss: 5.9655 | Val Recall@5: 0.0500 | Val NDCG@5: 0.0361 | Val Recall@10: 0.0758 | Val NDCG@10: 0.0445
+2026-04-26 11:10:25,471 - INFO - Epoch 32/100 | Train Loss: 5.9479 | Val Recall@5: 0.0513 | Val NDCG@5: 0.0366 | Val Recall@10: 0.0773 | Val NDCG@10: 0.0450
+2026-04-26 11:10:32,950 - INFO - Epoch 33/100 | Train Loss: 5.9378 | Val Recall@5: 0.0506 | Val NDCG@5: 0.0359 | Val Recall@10: 0.0762 | Val NDCG@10: 0.0441
+2026-04-26 11:10:40,059 - INFO - Epoch 34/100 | Train Loss: 5.9245 | Val Recall@5: 0.0513 | Val NDCG@5: 0.0367 | Val Recall@10: 0.0752 | Val NDCG@10: 0.0444
+2026-04-26 11:10:47,091 - INFO - Epoch 35/100 | Train Loss: 5.9089 | Val Recall@5: 0.0524 | Val NDCG@5: 0.0372 | Val Recall@10: 0.0750 | Val NDCG@10: 0.0445
+2026-04-26 11:10:54,054 - INFO - Epoch 36/100 | Train Loss: 5.8859 | Val Recall@5: 0.0500 | Val NDCG@5: 0.0358 | Val Recall@10: 0.0753 | Val NDCG@10: 0.0439
+2026-04-26 11:11:01,293 - INFO - Epoch 37/100 | Train Loss: 5.8798 | Val Recall@5: 0.0531 | Val NDCG@5: 0.0377 | Val Recall@10: 0.0758 | Val NDCG@10: 0.0450
+2026-04-26 11:11:08,310 - INFO - Epoch 38/100 | Train Loss: 5.8688 | Val Recall@5: 0.0541 | Val NDCG@5: 0.0378 | Val Recall@10: 0.0743 | Val NDCG@10: 0.0443
+2026-04-26 11:11:15,350 - INFO - Epoch 39/100 | Train Loss: 5.8555 | Val Recall@5: 0.0522 | Val NDCG@5: 0.0373 | Val Recall@10: 0.0750 | Val NDCG@10: 0.0446
+2026-04-26 11:11:22,273 - INFO - Epoch 40/100 | Train Loss: 5.8465 | Val Recall@5: 0.0523 | Val NDCG@5: 0.0376 | Val Recall@10: 0.0762 | Val NDCG@10: 0.0453
+2026-04-26 11:11:22,316 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0453
+2026-04-26 11:11:29,486 - INFO - Epoch 41/100 | Train Loss: 5.8299 | Val Recall@5: 0.0532 | Val NDCG@5: 0.0379 | Val Recall@10: 0.0750 | Val NDCG@10: 0.0449
+2026-04-26 11:11:36,569 - INFO - Epoch 42/100 | Train Loss: 5.8205 | Val Recall@5: 0.0543 | Val NDCG@5: 0.0386 | Val Recall@10: 0.0765 | Val NDCG@10: 0.0458
+2026-04-26 11:11:36,611 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0458
+2026-04-26 11:11:43,538 - INFO - Epoch 43/100 | Train Loss: 5.8055 | Val Recall@5: 0.0521 | Val NDCG@5: 0.0371 | Val Recall@10: 0.0751 | Val NDCG@10: 0.0445
+2026-04-26 11:11:50,207 - INFO - Epoch 44/100 | Train Loss: 5.8062 | Val Recall@5: 0.0539 | Val NDCG@5: 0.0381 | Val Recall@10: 0.0769 | Val NDCG@10: 0.0454
+2026-04-26 11:11:57,122 - INFO - Epoch 45/100 | Train Loss: 5.7925 | Val Recall@5: 0.0532 | Val NDCG@5: 0.0378 | Val Recall@10: 0.0760 | Val NDCG@10: 0.0452
+2026-04-26 11:12:04,477 - INFO - Epoch 46/100 | Train Loss: 5.7798 | Val Recall@5: 0.0519 | Val NDCG@5: 0.0372 | Val Recall@10: 0.0743 | Val NDCG@10: 0.0445
+2026-04-26 11:12:11,603 - INFO - Epoch 47/100 | Train Loss: 5.7747 | Val Recall@5: 0.0531 | Val NDCG@5: 0.0379 | Val Recall@10: 0.0754 | Val NDCG@10: 0.0450
+2026-04-26 11:12:18,624 - INFO - Epoch 48/100 | Train Loss: 5.7534 | Val Recall@5: 0.0539 | Val NDCG@5: 0.0378 | Val Recall@10: 0.0758 | Val NDCG@10: 0.0448
+2026-04-26 11:12:26,157 - INFO - Epoch 49/100 | Train Loss: 5.7507 | Val Recall@5: 0.0545 | Val NDCG@5: 0.0381 | Val Recall@10: 0.0767 | Val NDCG@10: 0.0452
+2026-04-26 11:12:33,158 - INFO - Epoch 50/100 | Train Loss: 5.7476 | Val Recall@5: 0.0524 | Val NDCG@5: 0.0375 | Val Recall@10: 0.0749 | Val NDCG@10: 0.0448
+2026-04-26 11:12:40,250 - INFO - Epoch 51/100 | Train Loss: 5.7362 | Val Recall@5: 0.0526 | Val NDCG@5: 0.0374 | Val Recall@10: 0.0753 | Val NDCG@10: 0.0447
+2026-04-26 11:12:47,659 - INFO - Epoch 52/100 | Train Loss: 5.7250 | Val Recall@5: 0.0524 | Val NDCG@5: 0.0374 | Val Recall@10: 0.0751 | Val NDCG@10: 0.0447
+2026-04-26 11:12:54,809 - INFO - Epoch 53/100 | Train Loss: 5.7213 | Val Recall@5: 0.0543 | Val NDCG@5: 0.0379 | Val Recall@10: 0.0765 | Val NDCG@10: 0.0451
+2026-04-26 11:13:02,277 - INFO - Epoch 54/100 | Train Loss: 5.7180 | Val Recall@5: 0.0533 | Val NDCG@5: 0.0385 | Val Recall@10: 0.0753 | Val NDCG@10: 0.0455
+2026-04-26 11:13:09,263 - INFO - Epoch 55/100 | Train Loss: 5.7103 | Val Recall@5: 0.0533 | Val NDCG@5: 0.0375 | Val Recall@10: 0.0744 | Val NDCG@10: 0.0443
+2026-04-26 11:13:16,300 - INFO - Epoch 56/100 | Train Loss: 5.7096 | Val Recall@5: 0.0518 | Val NDCG@5: 0.0370 | Val Recall@10: 0.0731 | Val NDCG@10: 0.0439
+2026-04-26 11:13:23,404 - INFO - Epoch 57/100 | Train Loss: 5.6887 | Val Recall@5: 0.0536 | Val NDCG@5: 0.0382 | Val Recall@10: 0.0749 | Val NDCG@10: 0.0451
+2026-04-26 11:13:30,815 - INFO - Epoch 58/100 | Train Loss: 5.6936 | Val Recall@5: 0.0534 | Val NDCG@5: 0.0379 | Val Recall@10: 0.0745 | Val NDCG@10: 0.0447
+2026-04-26 11:13:37,767 - INFO - Epoch 59/100 | Train Loss: 5.6796 | Val Recall@5: 0.0533 | Val NDCG@5: 0.0374 | Val Recall@10: 0.0754 | Val NDCG@10: 0.0445
+2026-04-26 11:13:45,057 - INFO - Epoch 60/100 | Train Loss: 5.6695 | Val Recall@5: 0.0515 | Val NDCG@5: 0.0369 | Val Recall@10: 0.0737 | Val NDCG@10: 0.0440
+2026-04-26 11:13:52,508 - INFO - Epoch 61/100 | Train Loss: 5.6721 | Val Recall@5: 0.0531 | Val NDCG@5: 0.0376 | Val Recall@10: 0.0758 | Val NDCG@10: 0.0449
+2026-04-26 11:13:59,534 - INFO - Epoch 62/100 | Train Loss: 5.6554 | Val Recall@5: 0.0516 | Val NDCG@5: 0.0367 | Val Recall@10: 0.0739 | Val NDCG@10: 0.0439
+2026-04-26 11:14:06,731 - INFO - Epoch 63/100 | Train Loss: 5.6553 | Val Recall@5: 0.0532 | Val NDCG@5: 0.0376 | Val Recall@10: 0.0750 | Val NDCG@10: 0.0446
+2026-04-26 11:14:13,814 - INFO - Epoch 64/100 | Train Loss: 5.6527 | Val Recall@5: 0.0514 | Val NDCG@5: 0.0364 | Val Recall@10: 0.0736 | Val NDCG@10: 0.0436
+2026-04-26 11:14:20,768 - INFO - Epoch 65/100 | Train Loss: 5.6487 | Val Recall@5: 0.0521 | Val NDCG@5: 0.0375 | Val Recall@10: 0.0747 | Val NDCG@10: 0.0447
+2026-04-26 11:14:28,033 - INFO - Epoch 66/100 | Train Loss: 5.6374 | Val Recall@5: 0.0528 | Val NDCG@5: 0.0375 | Val Recall@10: 0.0745 | Val NDCG@10: 0.0445
+2026-04-26 11:14:34,965 - INFO - Epoch 67/100 | Train Loss: 5.6337 | Val Recall@5: 0.0518 | Val NDCG@5: 0.0376 | Val Recall@10: 0.0733 | Val NDCG@10: 0.0445
+2026-04-26 11:14:42,005 - INFO - Epoch 68/100 | Train Loss: 5.6316 | Val Recall@5: 0.0544 | Val NDCG@5: 0.0380 | Val Recall@10: 0.0733 | Val NDCG@10: 0.0441
+2026-04-26 11:14:49,133 - INFO - Epoch 69/100 | Train Loss: 5.6219 | Val Recall@5: 0.0527 | Val NDCG@5: 0.0371 | Val Recall@10: 0.0751 | Val NDCG@10: 0.0443
+2026-04-26 11:14:56,044 - INFO - Epoch 70/100 | Train Loss: 5.6185 | Val Recall@5: 0.0544 | Val NDCG@5: 0.0384 | Val Recall@10: 0.0757 | Val NDCG@10: 0.0452
+2026-04-26 11:15:03,051 - INFO - Epoch 71/100 | Train Loss: 5.6127 | Val Recall@5: 0.0533 | Val NDCG@5: 0.0379 | Val Recall@10: 0.0749 | Val NDCG@10: 0.0449
+2026-04-26 11:15:10,367 - INFO - Epoch 72/100 | Train Loss: 5.6057 | Val Recall@5: 0.0523 | Val NDCG@5: 0.0370 | Val Recall@10: 0.0742 | Val NDCG@10: 0.0441
+2026-04-26 11:15:17,525 - INFO - Epoch 73/100 | Train Loss: 5.6066 | Val Recall@5: 0.0543 | Val NDCG@5: 0.0384 | Val Recall@10: 0.0748 | Val NDCG@10: 0.0450
+2026-04-26 11:15:24,477 - INFO - Epoch 74/100 | Train Loss: 5.5932 | Val Recall@5: 0.0523 | Val NDCG@5: 0.0369 | Val Recall@10: 0.0730 | Val NDCG@10: 0.0436
+2026-04-26 11:15:31,908 - INFO - Epoch 75/100 | Train Loss: 5.5878 | Val Recall@5: 0.0540 | Val NDCG@5: 0.0381 | Val Recall@10: 0.0743 | Val NDCG@10: 0.0446
+2026-04-26 11:15:38,740 - INFO - Epoch 76/100 | Train Loss: 5.5880 | Val Recall@5: 0.0521 | Val NDCG@5: 0.0370 | Val Recall@10: 0.0745 | Val NDCG@10: 0.0441
+2026-04-26 11:15:45,598 - INFO - Epoch 77/100 | Train Loss: 5.5834 | Val Recall@5: 0.0525 | Val NDCG@5: 0.0375 | Val Recall@10: 0.0744 | Val NDCG@10: 0.0445
+2026-04-26 11:15:52,680 - INFO - Epoch 78/100 | Train Loss: 5.5775 | Val Recall@5: 0.0523 | Val NDCG@5: 0.0375 | Val Recall@10: 0.0731 | Val NDCG@10: 0.0443
+2026-04-26 11:15:59,905 - INFO - Epoch 79/100 | Train Loss: 5.5764 | Val Recall@5: 0.0535 | Val NDCG@5: 0.0377 | Val Recall@10: 0.0735 | Val NDCG@10: 0.0442
+2026-04-26 11:16:06,918 - INFO - Epoch 80/100 | Train Loss: 5.5704 | Val Recall@5: 0.0534 | Val NDCG@5: 0.0380 | Val Recall@10: 0.0735 | Val NDCG@10: 0.0445
+2026-04-26 11:16:13,999 - INFO - Epoch 81/100 | Train Loss: 5.5621 | Val Recall@5: 0.0542 | Val NDCG@5: 0.0383 | Val Recall@10: 0.0754 | Val NDCG@10: 0.0451
+2026-04-26 11:16:20,816 - INFO - Epoch 82/100 | Train Loss: 5.5620 | Val Recall@5: 0.0533 | Val NDCG@5: 0.0380 | Val Recall@10: 0.0746 | Val NDCG@10: 0.0449
+2026-04-26 11:16:27,747 - INFO - Epoch 83/100 | Train Loss: 5.5574 | Val Recall@5: 0.0521 | Val NDCG@5: 0.0375 | Val Recall@10: 0.0731 | Val NDCG@10: 0.0443
+2026-04-26 11:16:35,116 - INFO - Epoch 84/100 | Train Loss: 5.5610 | Val Recall@5: 0.0529 | Val NDCG@5: 0.0372 | Val Recall@10: 0.0735 | Val NDCG@10: 0.0439
+2026-04-26 11:16:42,065 - INFO - Epoch 85/100 | Train Loss: 5.5541 | Val Recall@5: 0.0540 | Val NDCG@5: 0.0380 | Val Recall@10: 0.0742 | Val NDCG@10: 0.0446
+2026-04-26 11:16:49,130 - INFO - Epoch 86/100 | Train Loss: 5.5518 | Val Recall@5: 0.0525 | Val NDCG@5: 0.0372 | Val Recall@10: 0.0745 | Val NDCG@10: 0.0443
+2026-04-26 11:16:56,449 - INFO - Epoch 87/100 | Train Loss: 5.5451 | Val Recall@5: 0.0526 | Val NDCG@5: 0.0368 | Val Recall@10: 0.0741 | Val NDCG@10: 0.0437
+2026-04-26 11:17:03,637 - INFO - Epoch 88/100 | Train Loss: 5.5375 | Val Recall@5: 0.0524 | Val NDCG@5: 0.0371 | Val Recall@10: 0.0743 | Val NDCG@10: 0.0442
+2026-04-26 11:17:10,798 - INFO - Epoch 89/100 | Train Loss: 5.5341 | Val Recall@5: 0.0530 | Val NDCG@5: 0.0379 | Val Recall@10: 0.0749 | Val NDCG@10: 0.0449
+2026-04-26 11:17:18,051 - INFO - Epoch 90/100 | Train Loss: 5.5214 | Val Recall@5: 0.0527 | Val NDCG@5: 0.0381 | Val Recall@10: 0.0745 | Val NDCG@10: 0.0451
+2026-04-26 11:17:25,019 - INFO - Epoch 91/100 | Train Loss: 5.5318 | Val Recall@5: 0.0537 | Val NDCG@5: 0.0386 | Val Recall@10: 0.0762 | Val NDCG@10: 0.0459
+2026-04-26 11:17:25,061 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0459
+2026-04-26 11:17:31,914 - INFO - Epoch 92/100 | Train Loss: 5.5274 | Val Recall@5: 0.0527 | Val NDCG@5: 0.0385 | Val Recall@10: 0.0749 | Val NDCG@10: 0.0457
+2026-04-26 11:17:38,992 - INFO - Epoch 93/100 | Train Loss: 5.5180 | Val Recall@5: 0.0520 | Val NDCG@5: 0.0375 | Val Recall@10: 0.0731 | Val NDCG@10: 0.0443
+2026-04-26 11:17:45,992 - INFO - Epoch 94/100 | Train Loss: 5.5196 | Val Recall@5: 0.0540 | Val NDCG@5: 0.0385 | Val Recall@10: 0.0753 | Val NDCG@10: 0.0454
+2026-04-26 11:17:53,226 - INFO - Epoch 95/100 | Train Loss: 5.5181 | Val Recall@5: 0.0531 | Val NDCG@5: 0.0381 | Val Recall@10: 0.0749 | Val NDCG@10: 0.0451
+2026-04-26 11:18:00,306 - INFO - Epoch 96/100 | Train Loss: 5.5067 | Val Recall@5: 0.0531 | Val NDCG@5: 0.0376 | Val Recall@10: 0.0733 | Val NDCG@10: 0.0441
+2026-04-26 11:18:07,329 - INFO - Epoch 97/100 | Train Loss: 5.5073 | Val Recall@5: 0.0529 | Val NDCG@5: 0.0381 | Val Recall@10: 0.0742 | Val NDCG@10: 0.0449
+2026-04-26 11:18:14,244 - INFO - Epoch 98/100 | Train Loss: 5.5050 | Val Recall@5: 0.0530 | Val NDCG@5: 0.0380 | Val Recall@10: 0.0733 | Val NDCG@10: 0.0445
+2026-04-26 11:18:21,346 - INFO - Epoch 99/100 | Train Loss: 5.5014 | Val Recall@5: 0.0537 | Val NDCG@5: 0.0382 | Val Recall@10: 0.0740 | Val NDCG@10: 0.0447
+2026-04-26 11:18:28,475 - INFO - Epoch 100/100 | Train Loss: 5.4932 | Val Recall@5: 0.0522 | Val NDCG@5: 0.0381 | Val Recall@10: 0.0728 | Val NDCG@10: 0.0448
+2026-04-26 11:18:28,475 - INFO - Loading best model for Final Testing...
+2026-04-26 11:18:30,272 - INFO - 🏆 Final Test Results:
+  - Recall@5: 0.0707 | NDCG@5: 0.0500
+  - Recall@10: 0.0979 | NDCG@10: 0.0587
+2026-04-26 11:18:30,273 - INFO - Training completed!
+2026-04-26 11:47:50,501 - INFO - Training arguments: Namespace(dataset='beauty', root='../genrec/dataset/amazon', use_sampled_softmax=False, embed_dim=32, num_heads=2, num_blocks=2, dropout=0.2, max_seq_len=50, num_position_buckets=32, num_time_buckets=64, max_position_distance=128, use_temporal_bias=False, batch_size=128, epochs=100, lr=0.005, weight_decay=0.0, patience=50, device='cuda', checkpoint_dir='./checkpoints', eval_k=10)
+2026-04-26 11:47:50,501 - INFO - Loading datasets...
+2026-04-26 11:48:05,901 - INFO - Number of items: 12101
+2026-04-26 11:48:05,901 - INFO - Train samples: 22363
+2026-04-26 11:48:05,901 - INFO - Valid samples: 22363
+2026-04-26 11:48:05,901 - INFO - Test samples: 22363
+2026-04-26 11:48:05,901 - INFO - Initializing HMSR-HSTU model...
+2026-04-26 11:48:05,902 - INFO - ⚠️ 检测到 semantic_map 缺少第 0 行 (Padding)，正在自动补零对齐...
+2026-04-26 11:48:05,902 - INFO - 最终 item_semantic_map 维度: torch.Size([12102, 3])
+2026-04-26 11:48:05,916 - INFO - Model parameters: 845056
+2026-04-26 11:48:06,710 - INFO - Starting training...
+2026-04-26 11:48:34,446 - INFO - Training arguments: Namespace(dataset='beauty', root='../genrec/dataset/amazon', use_sampled_softmax=False, embed_dim=32, num_heads=2, num_blocks=2, dropout=0.2, max_seq_len=50, num_position_buckets=32, num_time_buckets=64, max_position_distance=128, use_temporal_bias=False, batch_size=128, epochs=100, lr=0.005, weight_decay=0.0, patience=50, device='cuda', checkpoint_dir='./checkpoints', eval_k=10)
+2026-04-26 11:48:34,446 - INFO - Loading datasets...
+2026-04-26 11:48:50,113 - INFO - Number of items: 12101
+2026-04-26 11:48:50,113 - INFO - Train samples: 22363
+2026-04-26 11:48:50,113 - INFO - Valid samples: 22363
+2026-04-26 11:48:50,113 - INFO - Test samples: 22363
+2026-04-26 11:48:50,114 - INFO - Initializing HMSR-HSTU model...
+2026-04-26 11:48:50,114 - INFO - ⚠️ 检测到 semantic_map 缺少第 0 行 (Padding)，正在自动补零对齐...
+2026-04-26 11:48:50,114 - INFO - 最终 item_semantic_map 维度: torch.Size([12102, 3])
+2026-04-26 11:48:50,134 - INFO - Model parameters: 857632
+2026-04-26 11:48:50,925 - INFO - Starting training...
+2026-04-26 11:48:58,078 - INFO - Epoch 01/100 | Train Loss: 8.5250 | Val Recall@5: 0.0229 | Val NDCG@5: 0.0144 | Val Recall@10: 0.0369 | Val NDCG@10: 0.0189
+2026-04-26 11:48:58,121 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0189
+2026-04-26 11:49:04,815 - INFO - Epoch 02/100 | Train Loss: 7.8864 | Val Recall@5: 0.0284 | Val NDCG@5: 0.0182 | Val Recall@10: 0.0461 | Val NDCG@10: 0.0239
+2026-04-26 11:49:04,858 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0239
+2026-04-26 11:49:11,829 - INFO - Epoch 03/100 | Train Loss: 7.6419 | Val Recall@5: 0.0333 | Val NDCG@5: 0.0213 | Val Recall@10: 0.0515 | Val NDCG@10: 0.0271
+2026-04-26 11:49:11,874 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0271
+2026-04-26 11:49:18,359 - INFO - Epoch 04/100 | Train Loss: 7.4609 | Val Recall@5: 0.0400 | Val NDCG@5: 0.0270 | Val Recall@10: 0.0594 | Val NDCG@10: 0.0331
+2026-04-26 11:49:18,401 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0331
+2026-04-26 11:49:24,612 - INFO - Epoch 05/100 | Train Loss: 7.3081 | Val Recall@5: 0.0450 | Val NDCG@5: 0.0300 | Val Recall@10: 0.0676 | Val NDCG@10: 0.0373
+2026-04-26 11:49:24,659 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0373
+2026-04-26 11:49:30,686 - INFO - Epoch 06/100 | Train Loss: 7.1719 | Val Recall@5: 0.0495 | Val NDCG@5: 0.0332 | Val Recall@10: 0.0732 | Val NDCG@10: 0.0408
+2026-04-26 11:49:30,713 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0408
+2026-04-26 11:49:36,758 - INFO - Epoch 07/100 | Train Loss: 7.0549 | Val Recall@5: 0.0482 | Val NDCG@5: 0.0331 | Val Recall@10: 0.0720 | Val NDCG@10: 0.0407
+2026-04-26 11:49:42,975 - INFO - Epoch 08/100 | Train Loss: 6.9473 | Val Recall@5: 0.0509 | Val NDCG@5: 0.0337 | Val Recall@10: 0.0777 | Val NDCG@10: 0.0423
+2026-04-26 11:49:43,027 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0423
+2026-04-26 11:49:48,860 - INFO - Epoch 09/100 | Train Loss: 6.8422 | Val Recall@5: 0.0505 | Val NDCG@5: 0.0347 | Val Recall@10: 0.0752 | Val NDCG@10: 0.0426
+2026-04-26 11:49:48,901 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0426
+2026-04-26 11:49:55,262 - INFO - Epoch 10/100 | Train Loss: 6.7599 | Val Recall@5: 0.0536 | Val NDCG@5: 0.0368 | Val Recall@10: 0.0791 | Val NDCG@10: 0.0450
+2026-04-26 11:49:55,305 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0450
+2026-04-26 11:50:01,344 - INFO - Epoch 11/100 | Train Loss: 6.6807 | Val Recall@5: 0.0526 | Val NDCG@5: 0.0366 | Val Recall@10: 0.0772 | Val NDCG@10: 0.0445
+2026-04-26 11:50:07,540 - INFO - Epoch 12/100 | Train Loss: 6.6042 | Val Recall@5: 0.0525 | Val NDCG@5: 0.0368 | Val Recall@10: 0.0772 | Val NDCG@10: 0.0448
+2026-04-26 11:50:13,689 - INFO - Epoch 13/100 | Train Loss: 6.5422 | Val Recall@5: 0.0508 | Val NDCG@5: 0.0348 | Val Recall@10: 0.0761 | Val NDCG@10: 0.0430
+2026-04-26 11:50:19,610 - INFO - Epoch 14/100 | Train Loss: 6.4805 | Val Recall@5: 0.0502 | Val NDCG@5: 0.0350 | Val Recall@10: 0.0761 | Val NDCG@10: 0.0434
+2026-04-26 11:50:25,748 - INFO - Epoch 15/100 | Train Loss: 6.4266 | Val Recall@5: 0.0537 | Val NDCG@5: 0.0371 | Val Recall@10: 0.0783 | Val NDCG@10: 0.0450
+2026-04-26 11:50:25,771 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0450
+2026-04-26 11:50:32,212 - INFO - Epoch 16/100 | Train Loss: 6.3805 | Val Recall@5: 0.0543 | Val NDCG@5: 0.0380 | Val Recall@10: 0.0783 | Val NDCG@10: 0.0458
+2026-04-26 11:50:32,254 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0458
+2026-04-26 11:50:38,317 - INFO - Epoch 17/100 | Train Loss: 6.3399 | Val Recall@5: 0.0558 | Val NDCG@5: 0.0385 | Val Recall@10: 0.0805 | Val NDCG@10: 0.0464
+2026-04-26 11:50:38,358 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0464
+2026-04-26 11:50:44,591 - INFO - Epoch 18/100 | Train Loss: 6.2942 | Val Recall@5: 0.0542 | Val NDCG@5: 0.0381 | Val Recall@10: 0.0784 | Val NDCG@10: 0.0459
+2026-04-26 11:50:51,548 - INFO - Epoch 19/100 | Train Loss: 6.2599 | Val Recall@5: 0.0545 | Val NDCG@5: 0.0386 | Val Recall@10: 0.0797 | Val NDCG@10: 0.0467
+2026-04-26 11:50:51,582 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0467
+2026-04-26 11:50:58,216 - INFO - Epoch 20/100 | Train Loss: 6.2246 | Val Recall@5: 0.0556 | Val NDCG@5: 0.0389 | Val Recall@10: 0.0790 | Val NDCG@10: 0.0464
+2026-04-26 11:51:04,797 - INFO - Epoch 21/100 | Train Loss: 6.1878 | Val Recall@5: 0.0546 | Val NDCG@5: 0.0389 | Val Recall@10: 0.0780 | Val NDCG@10: 0.0465
+2026-04-26 11:51:11,234 - INFO - Epoch 22/100 | Train Loss: 6.1600 | Val Recall@5: 0.0560 | Val NDCG@5: 0.0396 | Val Recall@10: 0.0809 | Val NDCG@10: 0.0476
+2026-04-26 11:51:11,277 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0476
+2026-04-26 11:51:17,687 - INFO - Epoch 23/100 | Train Loss: 6.1391 | Val Recall@5: 0.0551 | Val NDCG@5: 0.0390 | Val Recall@10: 0.0799 | Val NDCG@10: 0.0469
+2026-04-26 11:51:23,596 - INFO - Epoch 24/100 | Train Loss: 6.1017 | Val Recall@5: 0.0545 | Val NDCG@5: 0.0386 | Val Recall@10: 0.0786 | Val NDCG@10: 0.0464
+2026-04-26 11:51:29,864 - INFO - Epoch 25/100 | Train Loss: 6.0850 | Val Recall@5: 0.0537 | Val NDCG@5: 0.0379 | Val Recall@10: 0.0773 | Val NDCG@10: 0.0455
+2026-04-26 11:51:35,749 - INFO - Epoch 26/100 | Train Loss: 6.0630 | Val Recall@5: 0.0541 | Val NDCG@5: 0.0384 | Val Recall@10: 0.0775 | Val NDCG@10: 0.0459
+2026-04-26 11:51:41,878 - INFO - Epoch 27/100 | Train Loss: 6.0428 | Val Recall@5: 0.0547 | Val NDCG@5: 0.0386 | Val Recall@10: 0.0788 | Val NDCG@10: 0.0464
+2026-04-26 11:51:47,893 - INFO - Epoch 28/100 | Train Loss: 6.0199 | Val Recall@5: 0.0527 | Val NDCG@5: 0.0374 | Val Recall@10: 0.0781 | Val NDCG@10: 0.0456
+2026-04-26 11:51:54,323 - INFO - Epoch 29/100 | Train Loss: 6.0066 | Val Recall@5: 0.0529 | Val NDCG@5: 0.0375 | Val Recall@10: 0.0791 | Val NDCG@10: 0.0459
+2026-04-26 11:52:00,130 - INFO - Epoch 30/100 | Train Loss: 5.9836 | Val Recall@5: 0.0541 | Val NDCG@5: 0.0377 | Val Recall@10: 0.0782 | Val NDCG@10: 0.0455
+2026-04-26 11:52:06,370 - INFO - Epoch 31/100 | Train Loss: 5.9611 | Val Recall@5: 0.0549 | Val NDCG@5: 0.0381 | Val Recall@10: 0.0787 | Val NDCG@10: 0.0458
+2026-04-26 11:52:12,561 - INFO - Epoch 32/100 | Train Loss: 5.9519 | Val Recall@5: 0.0541 | Val NDCG@5: 0.0372 | Val Recall@10: 0.0787 | Val NDCG@10: 0.0451
+2026-04-26 11:52:18,619 - INFO - Epoch 33/100 | Train Loss: 5.9348 | Val Recall@5: 0.0533 | Val NDCG@5: 0.0377 | Val Recall@10: 0.0781 | Val NDCG@10: 0.0457
+2026-04-26 11:52:24,608 - INFO - Epoch 34/100 | Train Loss: 5.9217 | Val Recall@5: 0.0549 | Val NDCG@5: 0.0386 | Val Recall@10: 0.0790 | Val NDCG@10: 0.0464
+2026-04-26 12:00:25,540 - INFO - Training arguments: Namespace(dataset='beauty', root='../genrec/dataset/amazon', use_sampled_softmax=False, embed_dim=32, num_heads=2, num_blocks=2, dropout=0.2, max_seq_len=50, num_position_buckets=32, num_time_buckets=64, max_position_distance=128, use_temporal_bias=False, batch_size=128, epochs=100, lr=0.005, weight_decay=0.0, patience=50, device='cuda', checkpoint_dir='./checkpoints', eval_k=10)
+2026-04-26 12:00:25,540 - INFO - Loading datasets...
+2026-04-26 12:00:40,941 - INFO - Number of items: 12101
+2026-04-26 12:00:40,941 - INFO - Train samples: 22363
+2026-04-26 12:00:40,941 - INFO - Valid samples: 22363
+2026-04-26 12:00:40,941 - INFO - Test samples: 22363
+2026-04-26 12:00:40,941 - INFO - Initializing HMSR-HSTU model...
+2026-04-26 12:00:40,941 - INFO - ⚠️ 检测到 semantic_map 缺少第 0 行 (Padding)，正在自动补零对齐...
+2026-04-26 12:00:40,942 - INFO - 最终 item_semantic_map 维度: torch.Size([12102, 3])
+2026-04-26 12:00:40,961 - INFO - Model parameters: 857632
+2026-04-26 12:00:41,746 - INFO - Starting training...
+2026-04-26 12:01:35,332 - INFO - Training arguments: Namespace(dataset='beauty', root='../genrec/dataset/amazon', use_sampled_softmax=False, embed_dim=32, num_heads=2, num_blocks=2, dropout=0.2, max_seq_len=50, num_position_buckets=32, num_time_buckets=64, max_position_distance=128, use_temporal_bias=False, batch_size=128, epochs=100, lr=0.005, weight_decay=0.0, patience=50, device='cuda', checkpoint_dir='./checkpoints', eval_k=10)
+2026-04-26 12:01:35,332 - INFO - Loading datasets...
+2026-04-26 12:01:50,660 - INFO - Number of items: 12101
+2026-04-26 12:01:50,660 - INFO - Train samples: 22363
+2026-04-26 12:01:50,660 - INFO - Valid samples: 22363
+2026-04-26 12:01:50,660 - INFO - Test samples: 22363
+2026-04-26 12:01:50,660 - INFO - Initializing HMSR-HSTU model...
+2026-04-26 12:01:50,661 - INFO - ⚠️ 检测到 semantic_map 缺少第 0 行 (Padding)，正在自动补零对齐...
+2026-04-26 12:01:50,661 - INFO - 最终 item_semantic_map 维度: torch.Size([12102, 3])
+2026-04-26 12:01:50,676 - INFO - Model parameters: 857632
+2026-04-26 12:01:51,468 - INFO - Starting training...
+2026-04-26 12:05:39,264 - INFO - Training arguments: Namespace(dataset='beauty', root='../genrec/dataset/amazon', use_sampled_softmax=False, embed_dim=32, num_heads=2, num_blocks=2, dropout=0.2, max_seq_len=50, num_position_buckets=32, num_time_buckets=64, max_position_distance=128, use_temporal_bias=False, batch_size=128, epochs=100, lr=0.005, weight_decay=0.0, patience=50, device='cuda', checkpoint_dir='./checkpoints', eval_k=10)
+2026-04-26 12:05:39,264 - INFO - Loading datasets...
+2026-04-26 12:05:53,780 - INFO - Number of items: 12101
+2026-04-26 12:05:53,781 - INFO - Train samples: 22363
+2026-04-26 12:05:53,781 - INFO - Valid samples: 22363
+2026-04-26 12:05:53,781 - INFO - Test samples: 22363
+2026-04-26 12:05:53,781 - INFO - Initializing HMSR-HSTU model...
+2026-04-26 12:05:53,781 - INFO - ⚠️ 检测到 semantic_map 缺少第 0 行 (Padding)，正在自动补零对齐...
+2026-04-26 12:05:53,782 - INFO - 最终 item_semantic_map 维度: torch.Size([12102, 3])
+2026-04-26 12:05:53,796 - INFO - Model parameters: 874144
+2026-04-26 12:05:54,572 - INFO - Starting training...
+2026-04-26 12:06:01,411 - INFO - Epoch 01/100 | Train Loss: 8.4268 | Val Recall@5: 0.0242 | Val NDCG@5: 0.0156 | Val Recall@10: 0.0411 | Val NDCG@10: 0.0209
+2026-04-26 12:06:01,456 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0209
+2026-04-26 12:06:07,769 - INFO - Epoch 02/100 | Train Loss: 7.7791 | Val Recall@5: 0.0355 | Val NDCG@5: 0.0241 | Val Recall@10: 0.0559 | Val NDCG@10: 0.0306
+2026-04-26 12:06:07,811 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0306
+2026-04-26 12:06:16,763 - INFO - Training arguments: Namespace(dataset='beauty', root='../genrec/dataset/amazon', use_sampled_softmax=False, embed_dim=32, num_heads=2, num_blocks=2, dropout=0.2, max_seq_len=50, num_position_buckets=32, num_time_buckets=64, max_position_distance=128, use_temporal_bias=False, batch_size=128, epochs=100, lr=0.005, weight_decay=0.0, patience=50, device='cuda', checkpoint_dir='./checkpoints', eval_k=10)
+2026-04-26 12:06:16,763 - INFO - Loading datasets...
+2026-04-26 12:06:32,063 - INFO - Number of items: 12101
+2026-04-26 12:06:32,063 - INFO - Train samples: 22363
+2026-04-26 12:06:32,063 - INFO - Valid samples: 22363
+2026-04-26 12:06:32,063 - INFO - Test samples: 22363
+2026-04-26 12:06:32,063 - INFO - Initializing HMSR-HSTU model...
+2026-04-26 12:06:32,064 - INFO - ⚠️ 检测到 semantic_map 缺少第 0 行 (Padding)，正在自动补零对齐...
+2026-04-26 12:06:32,064 - INFO - 最终 item_semantic_map 维度: torch.Size([12102, 3])
+2026-04-26 12:06:32,084 - INFO - Model parameters: 874144
+2026-04-26 12:06:32,874 - INFO - Starting training...
+2026-04-26 12:06:40,479 - INFO - Epoch 01/100 | Train Loss: 8.4264 | Val Recall@5: 0.0283 | Val NDCG@5: 0.0186 | Val Recall@10: 0.0420 | Val NDCG@10: 0.0231
+2026-04-26 12:06:40,526 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0231
+2026-04-26 12:06:47,211 - INFO - Epoch 02/100 | Train Loss: 7.7779 | Val Recall@5: 0.0376 | Val NDCG@5: 0.0250 | Val Recall@10: 0.0572 | Val NDCG@10: 0.0313
+2026-04-26 12:06:47,255 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0313
+2026-04-26 12:06:53,999 - INFO - Epoch 03/100 | Train Loss: 7.5301 | Val Recall@5: 0.0434 | Val NDCG@5: 0.0293 | Val Recall@10: 0.0646 | Val NDCG@10: 0.0361
+2026-04-26 12:06:54,043 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0361
+2026-04-26 12:07:00,762 - INFO - Epoch 04/100 | Train Loss: 7.3285 | Val Recall@5: 0.0472 | Val NDCG@5: 0.0324 | Val Recall@10: 0.0719 | Val NDCG@10: 0.0403
+2026-04-26 12:07:00,806 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0403
+2026-04-26 12:07:07,515 - INFO - Epoch 05/100 | Train Loss: 7.1428 | Val Recall@5: 0.0489 | Val NDCG@5: 0.0328 | Val Recall@10: 0.0769 | Val NDCG@10: 0.0418
+2026-04-26 12:07:07,589 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0418
+2026-04-26 12:07:14,017 - INFO - Epoch 06/100 | Train Loss: 6.9910 | Val Recall@5: 0.0502 | Val NDCG@5: 0.0340 | Val Recall@10: 0.0749 | Val NDCG@10: 0.0420
+2026-04-26 12:07:14,061 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0420
+2026-04-26 12:07:20,448 - INFO - Epoch 07/100 | Train Loss: 6.8621 | Val Recall@5: 0.0513 | Val NDCG@5: 0.0356 | Val Recall@10: 0.0780 | Val NDCG@10: 0.0442
+2026-04-26 12:07:20,491 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0442
+2026-04-26 12:07:26,642 - INFO - Epoch 08/100 | Train Loss: 6.7545 | Val Recall@5: 0.0534 | Val NDCG@5: 0.0362 | Val Recall@10: 0.0807 | Val NDCG@10: 0.0450
+2026-04-26 12:07:26,685 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0450
+2026-04-26 12:07:32,870 - INFO - Epoch 09/100 | Train Loss: 6.6664 | Val Recall@5: 0.0521 | Val NDCG@5: 0.0358 | Val Recall@10: 0.0789 | Val NDCG@10: 0.0444
+2026-04-26 12:07:39,402 - INFO - Epoch 10/100 | Train Loss: 6.5893 | Val Recall@5: 0.0538 | Val NDCG@5: 0.0362 | Val Recall@10: 0.0806 | Val NDCG@10: 0.0449
+2026-04-26 12:07:46,039 - INFO - Epoch 11/100 | Train Loss: 6.5310 | Val Recall@5: 0.0543 | Val NDCG@5: 0.0364 | Val Recall@10: 0.0809 | Val NDCG@10: 0.0449
+2026-04-26 12:07:52,671 - INFO - Epoch 12/100 | Train Loss: 6.4767 | Val Recall@5: 0.0563 | Val NDCG@5: 0.0378 | Val Recall@10: 0.0828 | Val NDCG@10: 0.0463
+2026-04-26 12:07:52,720 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0463
+2026-04-26 12:07:59,293 - INFO - Epoch 13/100 | Train Loss: 6.4323 | Val Recall@5: 0.0555 | Val NDCG@5: 0.0371 | Val Recall@10: 0.0819 | Val NDCG@10: 0.0456
+2026-04-26 12:08:05,349 - INFO - Epoch 14/100 | Train Loss: 6.3799 | Val Recall@5: 0.0549 | Val NDCG@5: 0.0370 | Val Recall@10: 0.0819 | Val NDCG@10: 0.0458
+2026-04-26 12:08:11,441 - INFO - Epoch 15/100 | Train Loss: 6.3495 | Val Recall@5: 0.0533 | Val NDCG@5: 0.0368 | Val Recall@10: 0.0833 | Val NDCG@10: 0.0465
+2026-04-26 12:08:11,488 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0465
+2026-04-26 12:08:17,729 - INFO - Epoch 16/100 | Train Loss: 6.3154 | Val Recall@5: 0.0541 | Val NDCG@5: 0.0366 | Val Recall@10: 0.0795 | Val NDCG@10: 0.0448
+2026-04-26 12:08:23,804 - INFO - Epoch 17/100 | Train Loss: 6.2831 | Val Recall@5: 0.0537 | Val NDCG@5: 0.0366 | Val Recall@10: 0.0808 | Val NDCG@10: 0.0454
+2026-04-26 12:08:29,956 - INFO - Epoch 18/100 | Train Loss: 6.2470 | Val Recall@5: 0.0539 | Val NDCG@5: 0.0366 | Val Recall@10: 0.0808 | Val NDCG@10: 0.0454
+2026-04-26 12:08:36,129 - INFO - Epoch 19/100 | Train Loss: 6.2224 | Val Recall@5: 0.0544 | Val NDCG@5: 0.0370 | Val Recall@10: 0.0821 | Val NDCG@10: 0.0460
+2026-04-26 12:08:42,400 - INFO - Epoch 20/100 | Train Loss: 6.1966 | Val Recall@5: 0.0563 | Val NDCG@5: 0.0379 | Val Recall@10: 0.0822 | Val NDCG@10: 0.0462
+2026-04-26 12:08:48,835 - INFO - Epoch 21/100 | Train Loss: 6.1737 | Val Recall@5: 0.0550 | Val NDCG@5: 0.0372 | Val Recall@10: 0.0806 | Val NDCG@10: 0.0455
+2026-04-26 12:08:54,907 - INFO - Epoch 22/100 | Train Loss: 6.1477 | Val Recall@5: 0.0569 | Val NDCG@5: 0.0384 | Val Recall@10: 0.0835 | Val NDCG@10: 0.0470
+2026-04-26 12:08:54,949 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0470
+2026-04-26 12:09:01,007 - INFO - Epoch 23/100 | Train Loss: 6.1297 | Val Recall@5: 0.0540 | Val NDCG@5: 0.0363 | Val Recall@10: 0.0806 | Val NDCG@10: 0.0448
+2026-04-26 12:09:07,105 - INFO - Epoch 24/100 | Train Loss: 6.1104 | Val Recall@5: 0.0563 | Val NDCG@5: 0.0387 | Val Recall@10: 0.0815 | Val NDCG@10: 0.0468
+2026-04-26 12:09:13,320 - INFO - Epoch 25/100 | Train Loss: 6.0905 | Val Recall@5: 0.0558 | Val NDCG@5: 0.0383 | Val Recall@10: 0.0813 | Val NDCG@10: 0.0465
+2026-04-26 12:09:19,463 - INFO - Epoch 26/100 | Train Loss: 6.0782 | Val Recall@5: 0.0534 | Val NDCG@5: 0.0363 | Val Recall@10: 0.0799 | Val NDCG@10: 0.0448
+2026-04-26 12:09:25,715 - INFO - Epoch 27/100 | Train Loss: 6.0579 | Val Recall@5: 0.0552 | Val NDCG@5: 0.0383 | Val Recall@10: 0.0820 | Val NDCG@10: 0.0470
+2026-04-26 12:09:31,990 - INFO - Epoch 28/100 | Train Loss: 6.0349 | Val Recall@5: 0.0549 | Val NDCG@5: 0.0378 | Val Recall@10: 0.0809 | Val NDCG@10: 0.0462
+2026-04-26 12:09:38,074 - INFO - Epoch 29/100 | Train Loss: 6.0264 | Val Recall@5: 0.0536 | Val NDCG@5: 0.0371 | Val Recall@10: 0.0793 | Val NDCG@10: 0.0453
+2026-04-26 12:09:44,356 - INFO - Epoch 30/100 | Train Loss: 6.0101 | Val Recall@5: 0.0561 | Val NDCG@5: 0.0383 | Val Recall@10: 0.0813 | Val NDCG@10: 0.0464
+2026-04-26 12:09:50,915 - INFO - Epoch 31/100 | Train Loss: 6.0049 | Val Recall@5: 0.0542 | Val NDCG@5: 0.0373 | Val Recall@10: 0.0814 | Val NDCG@10: 0.0461
+2026-04-26 12:09:57,033 - INFO - Epoch 32/100 | Train Loss: 5.9891 | Val Recall@5: 0.0550 | Val NDCG@5: 0.0379 | Val Recall@10: 0.0803 | Val NDCG@10: 0.0461
+2026-04-26 12:10:03,543 - INFO - Epoch 33/100 | Train Loss: 5.9712 | Val Recall@5: 0.0556 | Val NDCG@5: 0.0383 | Val Recall@10: 0.0813 | Val NDCG@10: 0.0466
+2026-04-26 12:10:09,579 - INFO - Epoch 34/100 | Train Loss: 5.9600 | Val Recall@5: 0.0552 | Val NDCG@5: 0.0384 | Val Recall@10: 0.0819 | Val NDCG@10: 0.0470
+2026-04-26 12:10:15,559 - INFO - Epoch 35/100 | Train Loss: 5.9468 | Val Recall@5: 0.0550 | Val NDCG@5: 0.0380 | Val Recall@10: 0.0813 | Val NDCG@10: 0.0465
+2026-04-26 12:10:21,789 - INFO - Epoch 36/100 | Train Loss: 5.9312 | Val Recall@5: 0.0557 | Val NDCG@5: 0.0388 | Val Recall@10: 0.0812 | Val NDCG@10: 0.0470
+2026-04-26 12:10:21,832 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0470
+2026-04-26 12:10:27,989 - INFO - Epoch 37/100 | Train Loss: 5.9252 | Val Recall@5: 0.0559 | Val NDCG@5: 0.0383 | Val Recall@10: 0.0810 | Val NDCG@10: 0.0464
+2026-04-26 12:10:34,075 - INFO - Epoch 38/100 | Train Loss: 5.9141 | Val Recall@5: 0.0569 | Val NDCG@5: 0.0392 | Val Recall@10: 0.0810 | Val NDCG@10: 0.0470
+2026-04-26 12:10:40,639 - INFO - Epoch 39/100 | Train Loss: 5.9016 | Val Recall@5: 0.0558 | Val NDCG@5: 0.0387 | Val Recall@10: 0.0797 | Val NDCG@10: 0.0465
+2026-04-26 12:10:46,637 - INFO - Epoch 40/100 | Train Loss: 5.8915 | Val Recall@5: 0.0554 | Val NDCG@5: 0.0390 | Val Recall@10: 0.0796 | Val NDCG@10: 0.0468
+2026-04-26 12:10:52,950 - INFO - Epoch 41/100 | Train Loss: 5.8817 | Val Recall@5: 0.0558 | Val NDCG@5: 0.0392 | Val Recall@10: 0.0800 | Val NDCG@10: 0.0470
+2026-04-26 12:10:59,087 - INFO - Epoch 42/100 | Train Loss: 5.8748 | Val Recall@5: 0.0552 | Val NDCG@5: 0.0383 | Val Recall@10: 0.0816 | Val NDCG@10: 0.0468
+2026-04-26 12:11:05,477 - INFO - Epoch 43/100 | Train Loss: 5.8641 | Val Recall@5: 0.0546 | Val NDCG@5: 0.0378 | Val Recall@10: 0.0805 | Val NDCG@10: 0.0462
+2026-04-26 12:11:11,810 - INFO - Epoch 44/100 | Train Loss: 5.8587 | Val Recall@5: 0.0552 | Val NDCG@5: 0.0386 | Val Recall@10: 0.0824 | Val NDCG@10: 0.0473
+2026-04-26 12:11:11,853 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0473
+2026-04-26 12:11:17,735 - INFO - Epoch 45/100 | Train Loss: 5.8431 | Val Recall@5: 0.0557 | Val NDCG@5: 0.0386 | Val Recall@10: 0.0807 | Val NDCG@10: 0.0467
+2026-04-26 12:11:23,847 - INFO - Epoch 46/100 | Train Loss: 5.8358 | Val Recall@5: 0.0563 | Val NDCG@5: 0.0386 | Val Recall@10: 0.0797 | Val NDCG@10: 0.0462
+2026-04-26 12:11:30,070 - INFO - Epoch 47/100 | Train Loss: 5.8265 | Val Recall@5: 0.0550 | Val NDCG@5: 0.0382 | Val Recall@10: 0.0788 | Val NDCG@10: 0.0458
+2026-04-26 12:11:36,370 - INFO - Epoch 48/100 | Train Loss: 5.8144 | Val Recall@5: 0.0546 | Val NDCG@5: 0.0384 | Val Recall@10: 0.0805 | Val NDCG@10: 0.0468
+2026-04-26 12:11:42,291 - INFO - Epoch 49/100 | Train Loss: 5.8088 | Val Recall@5: 0.0551 | Val NDCG@5: 0.0383 | Val Recall@10: 0.0815 | Val NDCG@10: 0.0469
+2026-04-26 12:11:48,661 - INFO - Epoch 50/100 | Train Loss: 5.8068 | Val Recall@5: 0.0553 | Val NDCG@5: 0.0387 | Val Recall@10: 0.0804 | Val NDCG@10: 0.0468
+2026-04-26 12:11:54,757 - INFO - Epoch 51/100 | Train Loss: 5.8014 | Val Recall@5: 0.0550 | Val NDCG@5: 0.0384 | Val Recall@10: 0.0793 | Val NDCG@10: 0.0463
+2026-04-26 12:12:01,252 - INFO - Epoch 52/100 | Train Loss: 5.7875 | Val Recall@5: 0.0558 | Val NDCG@5: 0.0387 | Val Recall@10: 0.0797 | Val NDCG@10: 0.0464
+2026-04-26 12:12:07,548 - INFO - Epoch 53/100 | Train Loss: 5.7836 | Val Recall@5: 0.0557 | Val NDCG@5: 0.0388 | Val Recall@10: 0.0791 | Val NDCG@10: 0.0463
+2026-04-26 12:12:13,992 - INFO - Epoch 54/100 | Train Loss: 5.7715 | Val Recall@5: 0.0548 | Val NDCG@5: 0.0384 | Val Recall@10: 0.0784 | Val NDCG@10: 0.0460
+2026-04-26 12:12:20,207 - INFO - Epoch 55/100 | Train Loss: 5.7662 | Val Recall@5: 0.0550 | Val NDCG@5: 0.0382 | Val Recall@10: 0.0763 | Val NDCG@10: 0.0451
+2026-04-26 12:12:26,541 - INFO - Epoch 56/100 | Train Loss: 5.7563 | Val Recall@5: 0.0534 | Val NDCG@5: 0.0372 | Val Recall@10: 0.0780 | Val NDCG@10: 0.0452
+2026-04-26 12:12:32,743 - INFO - Epoch 57/100 | Train Loss: 5.7580 | Val Recall@5: 0.0544 | Val NDCG@5: 0.0379 | Val Recall@10: 0.0793 | Val NDCG@10: 0.0460
+2026-04-26 12:12:38,850 - INFO - Epoch 58/100 | Train Loss: 5.7459 | Val Recall@5: 0.0544 | Val NDCG@5: 0.0376 | Val Recall@10: 0.0794 | Val NDCG@10: 0.0457
+2026-04-26 12:12:45,021 - INFO - Epoch 59/100 | Train Loss: 5.7317 | Val Recall@5: 0.0543 | Val NDCG@5: 0.0385 | Val Recall@10: 0.0795 | Val NDCG@10: 0.0465
+2026-04-26 12:12:51,244 - INFO - Epoch 60/100 | Train Loss: 5.7295 | Val Recall@5: 0.0532 | Val NDCG@5: 0.0374 | Val Recall@10: 0.0793 | Val NDCG@10: 0.0458
+2026-04-26 12:12:57,704 - INFO - Epoch 61/100 | Train Loss: 5.7277 | Val Recall@5: 0.0550 | Val NDCG@5: 0.0383 | Val Recall@10: 0.0795 | Val NDCG@10: 0.0462
+2026-04-26 12:13:03,973 - INFO - Epoch 62/100 | Train Loss: 5.7172 | Val Recall@5: 0.0549 | Val NDCG@5: 0.0383 | Val Recall@10: 0.0793 | Val NDCG@10: 0.0462
+2026-04-26 12:13:10,203 - INFO - Epoch 63/100 | Train Loss: 5.7142 | Val Recall@5: 0.0537 | Val NDCG@5: 0.0380 | Val Recall@10: 0.0785 | Val NDCG@10: 0.0460
+2026-04-26 12:13:16,363 - INFO - Epoch 64/100 | Train Loss: 5.7038 | Val Recall@5: 0.0537 | Val NDCG@5: 0.0380 | Val Recall@10: 0.0793 | Val NDCG@10: 0.0462
+2026-04-26 12:13:22,819 - INFO - Epoch 65/100 | Train Loss: 5.7023 | Val Recall@5: 0.0549 | Val NDCG@5: 0.0385 | Val Recall@10: 0.0798 | Val NDCG@10: 0.0465
+2026-04-26 12:13:28,987 - INFO - Epoch 66/100 | Train Loss: 5.6951 | Val Recall@5: 0.0550 | Val NDCG@5: 0.0386 | Val Recall@10: 0.0792 | Val NDCG@10: 0.0464
+2026-04-26 12:13:35,196 - INFO - Epoch 67/100 | Train Loss: 5.6911 | Val Recall@5: 0.0537 | Val NDCG@5: 0.0378 | Val Recall@10: 0.0777 | Val NDCG@10: 0.0455
+2026-04-26 12:13:41,202 - INFO - Epoch 68/100 | Train Loss: 5.6856 | Val Recall@5: 0.0555 | Val NDCG@5: 0.0391 | Val Recall@10: 0.0795 | Val NDCG@10: 0.0468
+2026-04-26 12:13:47,436 - INFO - Epoch 69/100 | Train Loss: 5.6831 | Val Recall@5: 0.0553 | Val NDCG@5: 0.0385 | Val Recall@10: 0.0790 | Val NDCG@10: 0.0461
+2026-04-26 12:13:53,716 - INFO - Epoch 70/100 | Train Loss: 5.6689 | Val Recall@5: 0.0541 | Val NDCG@5: 0.0384 | Val Recall@10: 0.0786 | Val NDCG@10: 0.0463
+2026-04-26 12:13:59,747 - INFO - Epoch 71/100 | Train Loss: 5.6552 | Val Recall@5: 0.0542 | Val NDCG@5: 0.0377 | Val Recall@10: 0.0776 | Val NDCG@10: 0.0453
+2026-04-26 12:14:05,927 - INFO - Epoch 72/100 | Train Loss: 5.6621 | Val Recall@5: 0.0554 | Val NDCG@5: 0.0387 | Val Recall@10: 0.0778 | Val NDCG@10: 0.0459
+2026-04-26 12:14:12,151 - INFO - Epoch 73/100 | Train Loss: 5.6593 | Val Recall@5: 0.0560 | Val NDCG@5: 0.0392 | Val Recall@10: 0.0796 | Val NDCG@10: 0.0467
+2026-04-26 12:14:18,338 - INFO - Epoch 74/100 | Train Loss: 5.6549 | Val Recall@5: 0.0541 | Val NDCG@5: 0.0377 | Val Recall@10: 0.0796 | Val NDCG@10: 0.0459
+2026-04-26 12:14:24,683 - INFO - Epoch 75/100 | Train Loss: 5.6554 | Val Recall@5: 0.0557 | Val NDCG@5: 0.0392 | Val Recall@10: 0.0791 | Val NDCG@10: 0.0467
+2026-04-26 12:14:30,927 - INFO - Epoch 76/100 | Train Loss: 5.6387 | Val Recall@5: 0.0554 | Val NDCG@5: 0.0391 | Val Recall@10: 0.0792 | Val NDCG@10: 0.0467
+2026-04-26 12:14:37,286 - INFO - Epoch 77/100 | Train Loss: 5.6325 | Val Recall@5: 0.0537 | Val NDCG@5: 0.0374 | Val Recall@10: 0.0782 | Val NDCG@10: 0.0454
+2026-04-26 12:14:43,694 - INFO - Epoch 78/100 | Train Loss: 5.6369 | Val Recall@5: 0.0542 | Val NDCG@5: 0.0381 | Val Recall@10: 0.0784 | Val NDCG@10: 0.0459
+2026-04-26 12:14:50,046 - INFO - Epoch 79/100 | Train Loss: 5.6227 | Val Recall@5: 0.0558 | Val NDCG@5: 0.0395 | Val Recall@10: 0.0788 | Val NDCG@10: 0.0469
+2026-04-26 12:14:56,340 - INFO - Epoch 80/100 | Train Loss: 5.6232 | Val Recall@5: 0.0550 | Val NDCG@5: 0.0386 | Val Recall@10: 0.0791 | Val NDCG@10: 0.0464
+2026-04-26 12:15:02,523 - INFO - Epoch 81/100 | Train Loss: 5.6209 | Val Recall@5: 0.0560 | Val NDCG@5: 0.0399 | Val Recall@10: 0.0781 | Val NDCG@10: 0.0470
+2026-04-26 12:15:08,999 - INFO - Epoch 82/100 | Train Loss: 5.6136 | Val Recall@5: 0.0546 | Val NDCG@5: 0.0387 | Val Recall@10: 0.0788 | Val NDCG@10: 0.0465
+2026-04-26 12:15:15,153 - INFO - Epoch 83/100 | Train Loss: 5.6093 | Val Recall@5: 0.0549 | Val NDCG@5: 0.0386 | Val Recall@10: 0.0789 | Val NDCG@10: 0.0463
+2026-04-26 12:15:21,483 - INFO - Epoch 84/100 | Train Loss: 5.6044 | Val Recall@5: 0.0560 | Val NDCG@5: 0.0394 | Val Recall@10: 0.0798 | Val NDCG@10: 0.0471
+2026-04-26 12:15:27,448 - INFO - Epoch 85/100 | Train Loss: 5.6072 | Val Recall@5: 0.0557 | Val NDCG@5: 0.0391 | Val Recall@10: 0.0802 | Val NDCG@10: 0.0470
+2026-04-26 12:15:33,546 - INFO - Epoch 86/100 | Train Loss: 5.6030 | Val Recall@5: 0.0559 | Val NDCG@5: 0.0390 | Val Recall@10: 0.0780 | Val NDCG@10: 0.0462
+2026-04-26 12:15:39,547 - INFO - Epoch 87/100 | Train Loss: 5.6067 | Val Recall@5: 0.0561 | Val NDCG@5: 0.0397 | Val Recall@10: 0.0791 | Val NDCG@10: 0.0471
+2026-04-26 12:15:45,611 - INFO - Epoch 88/100 | Train Loss: 5.5930 | Val Recall@5: 0.0548 | Val NDCG@5: 0.0382 | Val Recall@10: 0.0773 | Val NDCG@10: 0.0454
+2026-04-26 12:15:51,815 - INFO - Epoch 89/100 | Train Loss: 5.5829 | Val Recall@5: 0.0551 | Val NDCG@5: 0.0389 | Val Recall@10: 0.0773 | Val NDCG@10: 0.0461
+2026-04-26 12:15:58,157 - INFO - Epoch 90/100 | Train Loss: 5.5813 | Val Recall@5: 0.0559 | Val NDCG@5: 0.0396 | Val Recall@10: 0.0796 | Val NDCG@10: 0.0472
+2026-04-26 12:16:04,091 - INFO - Epoch 91/100 | Train Loss: 5.5745 | Val Recall@5: 0.0553 | Val NDCG@5: 0.0397 | Val Recall@10: 0.0783 | Val NDCG@10: 0.0471
+2026-04-26 12:16:10,212 - INFO - Epoch 92/100 | Train Loss: 5.5776 | Val Recall@5: 0.0545 | Val NDCG@5: 0.0385 | Val Recall@10: 0.0768 | Val NDCG@10: 0.0456
+2026-04-26 12:16:16,514 - INFO - Epoch 93/100 | Train Loss: 5.5713 | Val Recall@5: 0.0550 | Val NDCG@5: 0.0384 | Val Recall@10: 0.0790 | Val NDCG@10: 0.0462
+2026-04-26 12:16:22,590 - INFO - Epoch 94/100 | Train Loss: 5.5701 | Val Recall@5: 0.0544 | Val NDCG@5: 0.0383 | Val Recall@10: 0.0773 | Val NDCG@10: 0.0457
+2026-04-26 12:16:22,590 - INFO - Early stopping triggered after 94 epochs (No improvement for 50 epochs).
+2026-04-26 12:16:22,591 - INFO - Loading best model for Final Testing...
+2026-04-26 12:16:24,203 - INFO - 🏆 Final Test Results:
+  - Recall@5: 0.0720 | NDCG@5: 0.0494
+  - Recall@10: 0.1015 | NDCG@10: 0.0590
+2026-04-26 12:16:24,203 - INFO - Training completed!
+2026-04-26 12:36:04,050 - INFO - Training arguments: Namespace(dataset='beauty', root='../genrec/dataset/amazon', use_sampled_softmax=False, embed_dim=32, num_heads=2, num_blocks=2, dropout=0.2, max_seq_len=50, num_position_buckets=32, num_time_buckets=64, max_position_distance=128, use_temporal_bias=False, batch_size=128, epochs=100, lr=0.005, weight_decay=0.0, patience=50, device='cuda', checkpoint_dir='./checkpoints', eval_k=10)
+2026-04-26 12:36:04,051 - INFO - Loading datasets...
+2026-04-26 12:36:19,123 - INFO - Number of items: 12101
+2026-04-26 12:36:19,123 - INFO - Train samples: 22363
+2026-04-26 12:36:19,123 - INFO - Valid samples: 22363
+2026-04-26 12:36:19,123 - INFO - Test samples: 22363
+2026-04-26 12:36:19,124 - INFO - Initializing HMSR-HSTU model...
+2026-04-26 12:36:19,124 - INFO - ⚠️ 检测到 semantic_map 缺少第 0 行 (Padding)，正在自动补零对齐...
+2026-04-26 12:36:19,125 - INFO - 最终 item_semantic_map 维度: torch.Size([12102, 3])
+2026-04-26 12:36:19,140 - INFO - Model parameters: 874144
+2026-04-26 12:36:19,987 - INFO - Starting training...
+2026-04-26 12:36:26,676 - INFO - Epoch 01/100 | Train Loss: 8.4220 | Val Recall@5: 0.0268 | Val NDCG@5: 0.0175 | Val Recall@10: 0.0439 | Val NDCG@10: 0.0230
+2026-04-26 12:36:26,722 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0230
+2026-04-26 12:36:32,911 - INFO - Epoch 02/100 | Train Loss: 7.7739 | Val Recall@5: 0.0355 | Val NDCG@5: 0.0231 | Val Recall@10: 0.0535 | Val NDCG@10: 0.0288
+2026-04-26 12:36:32,960 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0288
+2026-04-26 12:36:39,488 - INFO - Epoch 03/100 | Train Loss: 7.5433 | Val Recall@5: 0.0427 | Val NDCG@5: 0.0290 | Val Recall@10: 0.0621 | Val NDCG@10: 0.0352
+2026-04-26 12:36:39,534 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0352
+2026-04-26 12:36:46,080 - INFO - Epoch 04/100 | Train Loss: 7.3614 | Val Recall@5: 0.0446 | Val NDCG@5: 0.0303 | Val Recall@10: 0.0675 | Val NDCG@10: 0.0377
+2026-04-26 12:36:46,122 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0377
+2026-04-26 12:36:52,414 - INFO - Epoch 05/100 | Train Loss: 7.1853 | Val Recall@5: 0.0480 | Val NDCG@5: 0.0335 | Val Recall@10: 0.0716 | Val NDCG@10: 0.0411
+2026-04-26 12:36:52,496 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0411
+2026-04-26 12:36:58,812 - INFO - Epoch 06/100 | Train Loss: 7.0397 | Val Recall@5: 0.0513 | Val NDCG@5: 0.0350 | Val Recall@10: 0.0771 | Val NDCG@10: 0.0433
+2026-04-26 12:36:58,855 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0433
+2026-04-26 12:37:04,856 - INFO - Epoch 07/100 | Train Loss: 6.9068 | Val Recall@5: 0.0515 | Val NDCG@5: 0.0353 | Val Recall@10: 0.0780 | Val NDCG@10: 0.0439
+2026-04-26 12:37:04,909 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0439
+2026-04-26 12:37:11,231 - INFO - Epoch 08/100 | Train Loss: 6.8022 | Val Recall@5: 0.0528 | Val NDCG@5: 0.0367 | Val Recall@10: 0.0795 | Val NDCG@10: 0.0453
+2026-04-26 12:37:11,273 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0453
+2026-04-26 12:37:17,591 - INFO - Epoch 09/100 | Train Loss: 6.7115 | Val Recall@5: 0.0547 | Val NDCG@5: 0.0377 | Val Recall@10: 0.0799 | Val NDCG@10: 0.0458
+2026-04-26 12:37:17,632 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0458
+2026-04-26 12:37:24,086 - INFO - Epoch 10/100 | Train Loss: 6.6352 | Val Recall@5: 0.0537 | Val NDCG@5: 0.0370 | Val Recall@10: 0.0766 | Val NDCG@10: 0.0443
+2026-04-26 12:37:30,411 - INFO - Epoch 11/100 | Train Loss: 6.5533 | Val Recall@5: 0.0542 | Val NDCG@5: 0.0375 | Val Recall@10: 0.0779 | Val NDCG@10: 0.0451
+2026-04-26 12:37:36,689 - INFO - Epoch 12/100 | Train Loss: 6.4846 | Val Recall@5: 0.0560 | Val NDCG@5: 0.0375 | Val Recall@10: 0.0811 | Val NDCG@10: 0.0456
+2026-04-26 12:37:42,803 - INFO - Epoch 13/100 | Train Loss: 6.4317 | Val Recall@5: 0.0539 | Val NDCG@5: 0.0368 | Val Recall@10: 0.0787 | Val NDCG@10: 0.0448
+2026-04-26 12:37:48,862 - INFO - Epoch 14/100 | Train Loss: 6.3816 | Val Recall@5: 0.0522 | Val NDCG@5: 0.0358 | Val Recall@10: 0.0782 | Val NDCG@10: 0.0442
+2026-04-26 12:37:55,021 - INFO - Epoch 15/100 | Train Loss: 6.3597 | Val Recall@5: 0.0522 | Val NDCG@5: 0.0361 | Val Recall@10: 0.0777 | Val NDCG@10: 0.0443
+2026-04-26 12:38:01,374 - INFO - Epoch 16/100 | Train Loss: 6.3146 | Val Recall@5: 0.0530 | Val NDCG@5: 0.0366 | Val Recall@10: 0.0796 | Val NDCG@10: 0.0452
+2026-04-26 12:38:07,889 - INFO - Epoch 17/100 | Train Loss: 6.2729 | Val Recall@5: 0.0521 | Val NDCG@5: 0.0359 | Val Recall@10: 0.0766 | Val NDCG@10: 0.0438
+2026-04-26 12:38:13,985 - INFO - Epoch 18/100 | Train Loss: 6.2406 | Val Recall@5: 0.0530 | Val NDCG@5: 0.0358 | Val Recall@10: 0.0769 | Val NDCG@10: 0.0435
+2026-04-26 12:49:18,467 - INFO - Training arguments: Namespace(dataset='beauty', root='../genrec/dataset/amazon', use_sampled_softmax=False, embed_dim=32, num_heads=2, num_blocks=2, dropout=0.2, max_seq_len=50, num_position_buckets=32, num_time_buckets=64, max_position_distance=128, use_temporal_bias=False, batch_size=128, epochs=100, lr=0.005, weight_decay=0.0, patience=50, device='cuda', checkpoint_dir='./checkpoints', eval_k=10)
+2026-04-26 12:49:18,467 - INFO - Loading datasets...
+2026-04-26 12:49:33,701 - INFO - Number of items: 12101
+2026-04-26 12:49:33,701 - INFO - Train samples: 22363
+2026-04-26 12:49:33,701 - INFO - Valid samples: 22363
+2026-04-26 12:49:33,701 - INFO - Test samples: 22363
+2026-04-26 12:49:33,701 - INFO - Initializing HMSR-HSTU model...
+2026-04-26 12:49:33,701 - INFO - ⚠️ 检测到 semantic_map 缺少第 0 行 (Padding)，正在自动补零对齐...
+2026-04-26 12:49:33,702 - INFO - 最终 item_semantic_map 维度: torch.Size([12102, 3])
+2026-04-26 12:49:33,911 - INFO - Model parameters: 874016
+2026-04-26 12:49:34,723 - INFO - Starting training...
+2026-04-26 12:49:42,319 - INFO - Epoch 01/100 | Train Loss: 8.4596 | Val Recall@5: 0.0253 | Val NDCG@5: 0.0159 | Val Recall@10: 0.0408 | Val NDCG@10: 0.0209
+2026-04-26 12:49:42,428 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0209
+2026-04-26 12:49:48,902 - INFO - Epoch 02/100 | Train Loss: 7.7759 | Val Recall@5: 0.0333 | Val NDCG@5: 0.0229 | Val Recall@10: 0.0534 | Val NDCG@10: 0.0294
+2026-04-26 12:49:48,951 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0294
+2026-04-26 12:49:55,353 - INFO - Epoch 03/100 | Train Loss: 7.5235 | Val Recall@5: 0.0393 | Val NDCG@5: 0.0265 | Val Recall@10: 0.0613 | Val NDCG@10: 0.0335
+2026-04-26 12:49:55,473 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0335
+2026-04-26 12:50:02,170 - INFO - Epoch 04/100 | Train Loss: 7.3278 | Val Recall@5: 0.0457 | Val NDCG@5: 0.0319 | Val Recall@10: 0.0686 | Val NDCG@10: 0.0392
+2026-04-26 12:50:02,220 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0392
+2026-04-26 12:50:08,864 - INFO - Epoch 05/100 | Train Loss: 7.1487 | Val Recall@5: 0.0485 | Val NDCG@5: 0.0335 | Val Recall@10: 0.0724 | Val NDCG@10: 0.0411
+2026-04-26 12:50:08,951 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0411
+2026-04-26 12:50:15,681 - INFO - Epoch 06/100 | Train Loss: 6.9955 | Val Recall@5: 0.0487 | Val NDCG@5: 0.0333 | Val Recall@10: 0.0738 | Val NDCG@10: 0.0414
+2026-04-26 12:50:15,765 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0414
+2026-04-26 12:50:22,133 - INFO - Epoch 07/100 | Train Loss: 6.8679 | Val Recall@5: 0.0513 | Val NDCG@5: 0.0352 | Val Recall@10: 0.0772 | Val NDCG@10: 0.0435
+2026-04-26 12:50:22,217 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0435
+2026-04-26 12:50:28,341 - INFO - Epoch 08/100 | Train Loss: 6.7646 | Val Recall@5: 0.0531 | Val NDCG@5: 0.0367 | Val Recall@10: 0.0797 | Val NDCG@10: 0.0453
+2026-04-26 12:50:28,427 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0453
+2026-04-26 12:50:34,598 - INFO - Epoch 09/100 | Train Loss: 6.6757 | Val Recall@5: 0.0524 | Val NDCG@5: 0.0361 | Val Recall@10: 0.0792 | Val NDCG@10: 0.0448
+2026-04-26 12:50:41,191 - INFO - Epoch 10/100 | Train Loss: 6.5980 | Val Recall@5: 0.0528 | Val NDCG@5: 0.0357 | Val Recall@10: 0.0799 | Val NDCG@10: 0.0445
+2026-04-26 12:50:47,444 - INFO - Epoch 11/100 | Train Loss: 6.5315 | Val Recall@5: 0.0547 | Val NDCG@5: 0.0376 | Val Recall@10: 0.0821 | Val NDCG@10: 0.0465
+2026-04-26 12:50:47,524 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0465
+2026-04-26 12:50:54,038 - INFO - Epoch 12/100 | Train Loss: 6.4715 | Val Recall@5: 0.0528 | Val NDCG@5: 0.0364 | Val Recall@10: 0.0807 | Val NDCG@10: 0.0454
+2026-04-26 12:51:00,329 - INFO - Epoch 13/100 | Train Loss: 6.4317 | Val Recall@5: 0.0577 | Val NDCG@5: 0.0395 | Val Recall@10: 0.0833 | Val NDCG@10: 0.0477
+2026-04-26 12:51:00,407 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0477
+2026-04-26 12:51:06,718 - INFO - Epoch 14/100 | Train Loss: 6.3827 | Val Recall@5: 0.0544 | Val NDCG@5: 0.0371 | Val Recall@10: 0.0815 | Val NDCG@10: 0.0459
+2026-04-26 12:51:12,958 - INFO - Epoch 15/100 | Train Loss: 6.3426 | Val Recall@5: 0.0553 | Val NDCG@5: 0.0378 | Val Recall@10: 0.0823 | Val NDCG@10: 0.0466
+2026-04-26 12:51:19,534 - INFO - Epoch 16/100 | Train Loss: 6.3041 | Val Recall@5: 0.0559 | Val NDCG@5: 0.0384 | Val Recall@10: 0.0835 | Val NDCG@10: 0.0473
+2026-04-26 12:51:25,740 - INFO - Epoch 17/100 | Train Loss: 6.2759 | Val Recall@5: 0.0550 | Val NDCG@5: 0.0381 | Val Recall@10: 0.0821 | Val NDCG@10: 0.0469
+2026-04-26 12:51:32,337 - INFO - Epoch 18/100 | Train Loss: 6.2459 | Val Recall@5: 0.0551 | Val NDCG@5: 0.0378 | Val Recall@10: 0.0828 | Val NDCG@10: 0.0468
+2026-04-26 12:51:38,493 - INFO - Epoch 19/100 | Train Loss: 6.2133 | Val Recall@5: 0.0554 | Val NDCG@5: 0.0383 | Val Recall@10: 0.0805 | Val NDCG@10: 0.0464
+2026-04-26 12:51:44,929 - INFO - Epoch 20/100 | Train Loss: 6.1904 | Val Recall@5: 0.0563 | Val NDCG@5: 0.0384 | Val Recall@10: 0.0820 | Val NDCG@10: 0.0466
+2026-04-26 12:51:51,580 - INFO - Epoch 21/100 | Train Loss: 6.1687 | Val Recall@5: 0.0563 | Val NDCG@5: 0.0388 | Val Recall@10: 0.0807 | Val NDCG@10: 0.0467
+2026-04-26 12:51:58,254 - INFO - Epoch 22/100 | Train Loss: 6.1452 | Val Recall@5: 0.0554 | Val NDCG@5: 0.0382 | Val Recall@10: 0.0813 | Val NDCG@10: 0.0466
+2026-04-26 12:52:04,643 - INFO - Epoch 23/100 | Train Loss: 6.1252 | Val Recall@5: 0.0568 | Val NDCG@5: 0.0389 | Val Recall@10: 0.0825 | Val NDCG@10: 0.0471
+2026-04-26 12:52:10,920 - INFO - Epoch 24/100 | Train Loss: 6.1049 | Val Recall@5: 0.0572 | Val NDCG@5: 0.0394 | Val Recall@10: 0.0819 | Val NDCG@10: 0.0473
+2026-04-26 12:52:17,136 - INFO - Epoch 25/100 | Train Loss: 6.0863 | Val Recall@5: 0.0576 | Val NDCG@5: 0.0395 | Val Recall@10: 0.0810 | Val NDCG@10: 0.0470
+2026-04-26 12:52:23,689 - INFO - Epoch 26/100 | Train Loss: 6.0648 | Val Recall@5: 0.0552 | Val NDCG@5: 0.0388 | Val Recall@10: 0.0816 | Val NDCG@10: 0.0474
+2026-04-26 12:52:30,095 - INFO - Epoch 27/100 | Train Loss: 6.0522 | Val Recall@5: 0.0545 | Val NDCG@5: 0.0374 | Val Recall@10: 0.0787 | Val NDCG@10: 0.0452
+2026-04-26 12:52:36,782 - INFO - Epoch 28/100 | Train Loss: 6.0344 | Val Recall@5: 0.0566 | Val NDCG@5: 0.0392 | Val Recall@10: 0.0822 | Val NDCG@10: 0.0475
+2026-04-26 12:52:43,424 - INFO - Epoch 29/100 | Train Loss: 6.0187 | Val Recall@5: 0.0551 | Val NDCG@5: 0.0381 | Val Recall@10: 0.0829 | Val NDCG@10: 0.0470
+2026-04-26 12:52:50,147 - INFO - Epoch 30/100 | Train Loss: 6.0068 | Val Recall@5: 0.0550 | Val NDCG@5: 0.0386 | Val Recall@10: 0.0796 | Val NDCG@10: 0.0465
+2026-04-26 12:52:56,414 - INFO - Epoch 31/100 | Train Loss: 5.9783 | Val Recall@5: 0.0547 | Val NDCG@5: 0.0381 | Val Recall@10: 0.0796 | Val NDCG@10: 0.0461
+2026-04-26 12:53:02,835 - INFO - Epoch 32/100 | Train Loss: 5.9750 | Val Recall@5: 0.0561 | Val NDCG@5: 0.0388 | Val Recall@10: 0.0814 | Val NDCG@10: 0.0470
+2026-04-26 12:53:08,942 - INFO - Epoch 33/100 | Train Loss: 5.9586 | Val Recall@5: 0.0551 | Val NDCG@5: 0.0382 | Val Recall@10: 0.0801 | Val NDCG@10: 0.0462
+2026-04-26 12:53:15,234 - INFO - Epoch 34/100 | Train Loss: 5.9573 | Val Recall@5: 0.0554 | Val NDCG@5: 0.0391 | Val Recall@10: 0.0792 | Val NDCG@10: 0.0467
+2026-04-26 12:53:21,857 - INFO - Epoch 35/100 | Train Loss: 5.9372 | Val Recall@5: 0.0545 | Val NDCG@5: 0.0381 | Val Recall@10: 0.0794 | Val NDCG@10: 0.0461
+2026-04-26 12:53:28,207 - INFO - Epoch 36/100 | Train Loss: 5.9194 | Val Recall@5: 0.0557 | Val NDCG@5: 0.0390 | Val Recall@10: 0.0810 | Val NDCG@10: 0.0471
+2026-04-26 12:53:34,731 - INFO - Epoch 37/100 | Train Loss: 5.9112 | Val Recall@5: 0.0569 | Val NDCG@5: 0.0398 | Val Recall@10: 0.0804 | Val NDCG@10: 0.0474
+2026-04-26 12:53:41,255 - INFO - Epoch 38/100 | Train Loss: 5.9004 | Val Recall@5: 0.0560 | Val NDCG@5: 0.0388 | Val Recall@10: 0.0800 | Val NDCG@10: 0.0466
+2026-04-26 12:53:47,900 - INFO - Epoch 39/100 | Train Loss: 5.8890 | Val Recall@5: 0.0538 | Val NDCG@5: 0.0388 | Val Recall@10: 0.0787 | Val NDCG@10: 0.0467
+2026-04-26 12:53:54,244 - INFO - Epoch 40/100 | Train Loss: 5.8776 | Val Recall@5: 0.0567 | Val NDCG@5: 0.0394 | Val Recall@10: 0.0803 | Val NDCG@10: 0.0470
+2026-04-26 12:54:00,715 - INFO - Epoch 41/100 | Train Loss: 5.8727 | Val Recall@5: 0.0571 | Val NDCG@5: 0.0400 | Val Recall@10: 0.0808 | Val NDCG@10: 0.0476
+2026-04-26 12:54:06,939 - INFO - Epoch 42/100 | Train Loss: 5.8616 | Val Recall@5: 0.0557 | Val NDCG@5: 0.0393 | Val Recall@10: 0.0792 | Val NDCG@10: 0.0469
+2026-04-26 12:54:13,231 - INFO - Epoch 43/100 | Train Loss: 5.8443 | Val Recall@5: 0.0562 | Val NDCG@5: 0.0394 | Val Recall@10: 0.0804 | Val NDCG@10: 0.0471
+2026-04-26 12:54:19,762 - INFO - Epoch 44/100 | Train Loss: 5.8525 | Val Recall@5: 0.0573 | Val NDCG@5: 0.0401 | Val Recall@10: 0.0803 | Val NDCG@10: 0.0474
+2026-04-26 12:54:26,322 - INFO - Epoch 45/100 | Train Loss: 5.8320 | Val Recall@5: 0.0556 | Val NDCG@5: 0.0391 | Val Recall@10: 0.0800 | Val NDCG@10: 0.0470
+2026-04-26 12:54:32,642 - INFO - Epoch 46/100 | Train Loss: 5.8186 | Val Recall@5: 0.0553 | Val NDCG@5: 0.0388 | Val Recall@10: 0.0804 | Val NDCG@10: 0.0468
+2026-04-26 12:54:38,924 - INFO - Epoch 47/100 | Train Loss: 5.8179 | Val Recall@5: 0.0566 | Val NDCG@5: 0.0399 | Val Recall@10: 0.0797 | Val NDCG@10: 0.0473
+2026-04-26 12:54:45,057 - INFO - Epoch 48/100 | Train Loss: 5.8066 | Val Recall@5: 0.0555 | Val NDCG@5: 0.0386 | Val Recall@10: 0.0796 | Val NDCG@10: 0.0463
+2026-04-26 12:54:51,586 - INFO - Epoch 49/100 | Train Loss: 5.7969 | Val Recall@5: 0.0563 | Val NDCG@5: 0.0391 | Val Recall@10: 0.0793 | Val NDCG@10: 0.0465
+2026-04-26 12:54:58,249 - INFO - Epoch 50/100 | Train Loss: 5.7942 | Val Recall@5: 0.0546 | Val NDCG@5: 0.0387 | Val Recall@10: 0.0793 | Val NDCG@10: 0.0467
+2026-04-26 12:55:04,519 - INFO - Epoch 51/100 | Train Loss: 5.7783 | Val Recall@5: 0.0562 | Val NDCG@5: 0.0388 | Val Recall@10: 0.0796 | Val NDCG@10: 0.0463
+2026-04-26 12:55:10,983 - INFO - Epoch 52/100 | Train Loss: 5.7784 | Val Recall@5: 0.0575 | Val NDCG@5: 0.0399 | Val Recall@10: 0.0793 | Val NDCG@10: 0.0469
+2026-04-26 12:55:17,343 - INFO - Epoch 53/100 | Train Loss: 5.7696 | Val Recall@5: 0.0552 | Val NDCG@5: 0.0388 | Val Recall@10: 0.0787 | Val NDCG@10: 0.0463
+2026-04-26 12:55:23,920 - INFO - Epoch 54/100 | Train Loss: 5.7662 | Val Recall@5: 0.0555 | Val NDCG@5: 0.0389 | Val Recall@10: 0.0787 | Val NDCG@10: 0.0463
+2026-04-26 12:55:30,278 - INFO - Epoch 55/100 | Train Loss: 5.7567 | Val Recall@5: 0.0536 | Val NDCG@5: 0.0378 | Val Recall@10: 0.0778 | Val NDCG@10: 0.0455
+2026-04-26 12:55:36,589 - INFO - Epoch 56/100 | Train Loss: 5.7513 | Val Recall@5: 0.0560 | Val NDCG@5: 0.0391 | Val Recall@10: 0.0788 | Val NDCG@10: 0.0465
+2026-04-26 12:55:43,015 - INFO - Epoch 57/100 | Train Loss: 5.7416 | Val Recall@5: 0.0559 | Val NDCG@5: 0.0394 | Val Recall@10: 0.0799 | Val NDCG@10: 0.0471
+2026-04-26 12:55:49,507 - INFO - Epoch 58/100 | Train Loss: 5.7388 | Val Recall@5: 0.0564 | Val NDCG@5: 0.0393 | Val Recall@10: 0.0798 | Val NDCG@10: 0.0468
+2026-04-26 12:55:55,798 - INFO - Epoch 59/100 | Train Loss: 5.7239 | Val Recall@5: 0.0557 | Val NDCG@5: 0.0392 | Val Recall@10: 0.0792 | Val NDCG@10: 0.0468
+2026-04-26 12:56:02,315 - INFO - Epoch 60/100 | Train Loss: 5.7207 | Val Recall@5: 0.0550 | Val NDCG@5: 0.0379 | Val Recall@10: 0.0782 | Val NDCG@10: 0.0453
+2026-04-26 12:56:08,926 - INFO - Epoch 61/100 | Train Loss: 5.7133 | Val Recall@5: 0.0558 | Val NDCG@5: 0.0391 | Val Recall@10: 0.0788 | Val NDCG@10: 0.0465
+2026-04-26 12:56:15,225 - INFO - Epoch 62/100 | Train Loss: 5.7028 | Val Recall@5: 0.0545 | Val NDCG@5: 0.0383 | Val Recall@10: 0.0794 | Val NDCG@10: 0.0463
+2026-04-26 12:56:21,565 - INFO - Epoch 63/100 | Train Loss: 5.7024 | Val Recall@5: 0.0550 | Val NDCG@5: 0.0390 | Val Recall@10: 0.0804 | Val NDCG@10: 0.0471
+2026-04-26 12:56:21,565 - INFO - Early stopping triggered after 63 epochs (No improvement for 50 epochs).
+2026-04-26 12:56:21,566 - INFO - Loading best model for Final Testing...
+2026-04-26 12:56:23,289 - INFO - 🏆 Final Test Results:
+  - Recall@5: 0.0719 | NDCG@5: 0.0481
+  - Recall@10: 0.1037 | NDCG@10: 0.0583
+2026-04-26 12:56:23,290 - INFO - Training completed!
+2026-04-26 13:03:24,756 - INFO - Training arguments: Namespace(dataset='beauty', root='../genrec/dataset/amazon', use_sampled_softmax=False, embed_dim=32, num_heads=2, num_blocks=2, dropout=0.2, max_seq_len=50, num_position_buckets=32, num_time_buckets=64, max_position_distance=128, use_temporal_bias=False, batch_size=128, epochs=100, lr=0.005, weight_decay=0.0, patience=50, device='cuda', checkpoint_dir='./checkpoints', eval_k=10)
+2026-04-26 13:03:24,756 - INFO - Loading datasets...
+2026-04-26 13:03:39,368 - INFO - Number of items: 12101
+2026-04-26 13:03:39,368 - INFO - Train samples: 22363
+2026-04-26 13:03:39,368 - INFO - Valid samples: 22363
+2026-04-26 13:03:39,368 - INFO - Test samples: 22363
+2026-04-26 13:03:39,368 - INFO - Initializing HMSR-HSTU model...
+2026-04-26 13:03:39,369 - INFO - ⚠️ 检测到 semantic_map 缺少第 0 行 (Padding)，正在自动补零对齐...
+2026-04-26 13:03:39,369 - INFO - 最终 item_semantic_map 维度: torch.Size([12102, 3])
+2026-04-26 13:04:02,411 - INFO - Training arguments: Namespace(dataset='beauty', root='../genrec/dataset/amazon', use_sampled_softmax=False, embed_dim=32, num_heads=2, num_blocks=2, dropout=0.2, max_seq_len=50, num_position_buckets=32, num_time_buckets=64, max_position_distance=128, use_temporal_bias=False, batch_size=128, epochs=100, lr=0.005, weight_decay=0.0, patience=50, device='cuda', checkpoint_dir='./checkpoints', eval_k=10)
+2026-04-26 13:04:02,411 - INFO - Loading datasets...
+2026-04-26 13:04:17,053 - INFO - Number of items: 12101
+2026-04-26 13:04:17,053 - INFO - Train samples: 22363
+2026-04-26 13:04:17,053 - INFO - Valid samples: 22363
+2026-04-26 13:04:17,053 - INFO - Test samples: 22363
+2026-04-26 13:04:17,054 - INFO - Initializing HMSR-HSTU model...
+2026-04-26 13:04:17,054 - INFO - ⚠️ 检测到 semantic_map 缺少第 0 行 (Padding)，正在自动补零对齐...
+2026-04-26 13:04:17,054 - INFO - 最终 item_semantic_map 维度: torch.Size([12102, 3])
+2026-04-26 13:04:30,144 - INFO - Training arguments: Namespace(dataset='beauty', root='../genrec/dataset/amazon', use_sampled_softmax=False, embed_dim=32, num_heads=2, num_blocks=2, dropout=0.2, max_seq_len=50, num_position_buckets=32, num_time_buckets=64, max_position_distance=128, use_temporal_bias=False, batch_size=128, epochs=100, lr=0.005, weight_decay=0.0, patience=50, device='cuda', checkpoint_dir='./checkpoints', eval_k=10)
+2026-04-26 13:04:30,144 - INFO - Loading datasets...
+2026-04-26 13:04:44,922 - INFO - Training arguments: Namespace(dataset='beauty', root='../genrec/dataset/amazon', use_sampled_softmax=False, embed_dim=32, num_heads=2, num_blocks=2, dropout=0.2, max_seq_len=50, num_position_buckets=32, num_time_buckets=64, max_position_distance=128, use_temporal_bias=False, batch_size=128, epochs=100, lr=0.005, weight_decay=0.0, patience=50, device='cuda', checkpoint_dir='./checkpoints', eval_k=10)
+2026-04-26 13:04:44,922 - INFO - Loading datasets...
+2026-04-26 13:05:00,428 - INFO - Number of items: 12101
+2026-04-26 13:05:00,428 - INFO - Train samples: 22363
+2026-04-26 13:05:00,428 - INFO - Valid samples: 22363
+2026-04-26 13:05:00,428 - INFO - Test samples: 22363
+2026-04-26 13:05:00,428 - INFO - Initializing HMSR-HSTU model...
+2026-04-26 13:05:00,428 - INFO - ⚠️ 检测到 semantic_map 缺少第 0 行 (Padding)，正在自动补零对齐...
+2026-04-26 13:05:00,429 - INFO - 最终 item_semantic_map 维度: torch.Size([12102, 3])
+2026-04-26 13:05:14,446 - INFO - Training arguments: Namespace(dataset='beauty', root='../genrec/dataset/amazon', use_sampled_softmax=False, embed_dim=32, num_heads=2, num_blocks=2, dropout=0.2, max_seq_len=50, num_position_buckets=32, num_time_buckets=64, max_position_distance=128, use_temporal_bias=False, batch_size=128, epochs=100, lr=0.005, weight_decay=0.0, patience=50, device='cuda', checkpoint_dir='./checkpoints', eval_k=10)
+2026-04-26 13:05:14,446 - INFO - Loading datasets...
+2026-04-26 13:05:29,796 - INFO - Number of items: 12101
+2026-04-26 13:05:29,796 - INFO - Train samples: 22363
+2026-04-26 13:05:29,796 - INFO - Valid samples: 22363
+2026-04-26 13:05:29,796 - INFO - Test samples: 22363
+2026-04-26 13:05:29,797 - INFO - Initializing HMSR-HSTU model...
+2026-04-26 13:05:29,797 - INFO - ⚠️ 检测到 semantic_map 缺少第 0 行 (Padding)，正在自动补零对齐...
+2026-04-26 13:05:29,797 - INFO - 最终 item_semantic_map 维度: torch.Size([12102, 3])
+2026-04-26 13:05:29,820 - INFO - Model parameters: 874016
+2026-04-26 13:05:30,621 - INFO - Starting training...
+2026-04-26 13:05:37,297 - INFO - Epoch 01/100 | Train Loss: 8.4869 | Val Recall@5: 0.0242 | Val NDCG@5: 0.0156 | Val Recall@10: 0.0409 | Val NDCG@10: 0.0210
+2026-04-26 13:05:37,372 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0210
+2026-04-26 13:05:44,193 - INFO - Epoch 02/100 | Train Loss: 7.8214 | Val Recall@5: 0.0331 | Val NDCG@5: 0.0222 | Val Recall@10: 0.0512 | Val NDCG@10: 0.0280
+2026-04-26 13:05:44,243 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0280
+2026-04-26 13:05:50,997 - INFO - Epoch 03/100 | Train Loss: 7.5712 | Val Recall@5: 0.0411 | Val NDCG@5: 0.0276 | Val Recall@10: 0.0621 | Val NDCG@10: 0.0343
+2026-04-26 13:05:51,104 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0343
+2026-04-26 13:05:57,949 - INFO - Epoch 04/100 | Train Loss: 7.3703 | Val Recall@5: 0.0428 | Val NDCG@5: 0.0289 | Val Recall@10: 0.0668 | Val NDCG@10: 0.0366
+2026-04-26 13:05:58,063 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0366
+2026-04-26 13:06:04,942 - INFO - Epoch 05/100 | Train Loss: 7.1934 | Val Recall@5: 0.0481 | Val NDCG@5: 0.0328 | Val Recall@10: 0.0743 | Val NDCG@10: 0.0413
+2026-04-26 13:06:05,046 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0413
+2026-04-26 13:06:12,244 - INFO - Epoch 06/100 | Train Loss: 7.0366 | Val Recall@5: 0.0479 | Val NDCG@5: 0.0325 | Val Recall@10: 0.0729 | Val NDCG@10: 0.0405
+2026-04-26 13:06:19,020 - INFO - Epoch 07/100 | Train Loss: 6.9046 | Val Recall@5: 0.0525 | Val NDCG@5: 0.0353 | Val Recall@10: 0.0782 | Val NDCG@10: 0.0436
+2026-04-26 13:06:19,132 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0436
+2026-04-26 13:06:26,042 - INFO - Epoch 08/100 | Train Loss: 6.7931 | Val Recall@5: 0.0525 | Val NDCG@5: 0.0352 | Val Recall@10: 0.0787 | Val NDCG@10: 0.0437
+2026-04-26 13:06:26,165 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0437
+2026-04-26 13:06:32,979 - INFO - Epoch 09/100 | Train Loss: 6.6993 | Val Recall@5: 0.0544 | Val NDCG@5: 0.0369 | Val Recall@10: 0.0819 | Val NDCG@10: 0.0458
+2026-04-26 13:06:33,106 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0458
+2026-04-26 13:06:39,436 - INFO - Epoch 10/100 | Train Loss: 6.6239 | Val Recall@5: 0.0554 | Val NDCG@5: 0.0374 | Val Recall@10: 0.0810 | Val NDCG@10: 0.0457
+2026-04-26 13:06:45,695 - INFO - Epoch 11/100 | Train Loss: 6.5565 | Val Recall@5: 0.0537 | Val NDCG@5: 0.0370 | Val Recall@10: 0.0816 | Val NDCG@10: 0.0460
+2026-04-26 13:06:45,782 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0460
+2026-04-26 13:17:13,067 - INFO - Training arguments: Namespace(dataset='beauty', root='../genrec/dataset/amazon', use_sampled_softmax=False, embed_dim=32, num_heads=2, num_blocks=2, dropout=0.2, max_seq_len=50, num_position_buckets=32, num_time_buckets=64, max_position_distance=128, use_temporal_bias=False, batch_size=128, epochs=100, lr=0.005, weight_decay=0.0, patience=50, device='cuda', checkpoint_dir='./checkpoints', eval_k=10)
+2026-04-26 13:17:13,067 - INFO - Loading datasets...
+2026-04-26 13:17:28,133 - INFO - Number of items: 12101
+2026-04-26 13:17:28,134 - INFO - Train samples: 22363
+2026-04-26 13:17:28,134 - INFO - Valid samples: 22363
+2026-04-26 13:17:28,134 - INFO - Test samples: 22363
+2026-04-26 13:17:28,134 - INFO - Initializing HMSR-HSTU model...
+2026-04-26 13:17:28,134 - INFO - ⚠️ 检测到 semantic_map 缺少第 0 行 (Padding)，正在自动补零对齐...
+2026-04-26 13:17:28,135 - INFO - 最终 item_semantic_map 维度: torch.Size([12102, 3])
+2026-04-26 13:17:28,151 - INFO - Model parameters: 874016
+2026-04-26 13:17:28,965 - INFO - Starting training...
+2026-04-26 13:17:36,409 - INFO - Epoch 01/100 | Train Loss: 8.4308 | Val Recall@5: 0.0274 | Val NDCG@5: 0.0187 | Val Recall@10: 0.0438 | Val NDCG@10: 0.0241
+2026-04-26 13:17:36,492 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0241
+2026-04-26 13:17:43,454 - INFO - Epoch 02/100 | Train Loss: 7.7730 | Val Recall@5: 0.0373 | Val NDCG@5: 0.0250 | Val Recall@10: 0.0577 | Val NDCG@10: 0.0316
+2026-04-26 13:17:43,552 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0316
+2026-04-26 13:17:50,356 - INFO - Epoch 03/100 | Train Loss: 7.5180 | Val Recall@5: 0.0426 | Val NDCG@5: 0.0289 | Val Recall@10: 0.0662 | Val NDCG@10: 0.0365
+2026-04-26 13:17:50,484 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0365
+2026-04-26 13:17:57,010 - INFO - Epoch 04/100 | Train Loss: 7.3138 | Val Recall@5: 0.0498 | Val NDCG@5: 0.0340 | Val Recall@10: 0.0733 | Val NDCG@10: 0.0415
+2026-04-26 13:17:57,129 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0415
+2026-04-26 13:18:04,353 - INFO - Training arguments: Namespace(dataset='beauty', root='../genrec/dataset/amazon', use_sampled_softmax=False, embed_dim=32, num_heads=2, num_blocks=2, dropout=0.2, max_seq_len=50, num_position_buckets=32, num_time_buckets=64, max_position_distance=128, use_temporal_bias=False, batch_size=128, epochs=100, lr=0.005, weight_decay=0.0, patience=50, device='cuda', checkpoint_dir='./checkpoints', eval_k=10)
+2026-04-26 13:18:04,353 - INFO - Loading datasets...
+2026-04-26 13:18:19,227 - INFO - Number of items: 12101
+2026-04-26 13:18:19,227 - INFO - Train samples: 22363
+2026-04-26 13:18:19,227 - INFO - Valid samples: 22363
+2026-04-26 13:18:19,227 - INFO - Test samples: 22363
+2026-04-26 13:18:19,227 - INFO - Initializing HMSR-HSTU model...
+2026-04-26 13:18:19,228 - INFO - ⚠️ 检测到 semantic_map 缺少第 0 行 (Padding)，正在自动补零对齐...
+2026-04-26 13:18:19,228 - INFO - 最终 item_semantic_map 维度: torch.Size([12102, 3])
+2026-04-26 13:18:19,252 - INFO - Model parameters: 874016
+2026-04-26 13:18:20,027 - INFO - Starting training...
+2026-04-26 13:18:26,816 - INFO - Epoch 01/100 | Train Loss: 8.4721 | Val Recall@5: 0.0238 | Val NDCG@5: 0.0151 | Val Recall@10: 0.0385 | Val NDCG@10: 0.0198
+2026-04-26 13:18:26,946 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0198
+2026-04-26 13:19:07,305 - INFO - Training arguments: Namespace(dataset='beauty', root='../genrec/dataset/amazon', use_sampled_softmax=False, embed_dim=32, num_heads=2, num_blocks=2, dropout=0.2, max_seq_len=50, num_position_buckets=32, num_time_buckets=64, max_position_distance=128, use_temporal_bias=True, batch_size=128, epochs=100, lr=0.005, weight_decay=0.0, patience=50, device='cuda', checkpoint_dir='./checkpoints', eval_k=10)
+2026-04-26 13:19:07,305 - INFO - Loading datasets...
+2026-04-26 13:19:22,450 - INFO - Number of items: 12101
+2026-04-26 13:19:22,450 - INFO - Train samples: 22363
+2026-04-26 13:19:22,450 - INFO - Valid samples: 22363
+2026-04-26 13:19:22,450 - INFO - Test samples: 22363
+2026-04-26 13:19:22,451 - INFO - Initializing HMSR-HSTU model...
+2026-04-26 13:19:22,451 - INFO - ⚠️ 检测到 semantic_map 缺少第 0 行 (Padding)，正在自动补零对齐...
+2026-04-26 13:19:22,451 - INFO - 最终 item_semantic_map 维度: torch.Size([12102, 3])
+2026-04-26 13:19:22,475 - INFO - Model parameters: 874272
+2026-04-26 13:19:23,279 - INFO - Starting training...
+2026-04-26 13:19:34,885 - INFO - Epoch 01/100 | Train Loss: 8.4438 | Val Recall@5: 0.0273 | Val NDCG@5: 0.0173 | Val Recall@10: 0.0419 | Val NDCG@10: 0.0220
+2026-04-26 13:19:35,013 - INFO -   🌟 Saved new best model with Val NDCG@10: 0.0220
+2026-04-26 13:22:16,871 - INFO - Training arguments: Namespace(dataset='beauty', root='../genrec/dataset/amazon', use_sampled_softmax=False, embed_dim=32, num_heads=2, num_blocks=2, dropout=0.2, max_seq_len=50, num_position_buckets=32, num_time_buckets=64, max_position_distance=128, use_temporal_bias=True, batch_size=128, epochs=100, lr=0.005, weight_decay=0.0, patience=50, device='cuda', checkpoint_dir='./checkpoints', eval_k=10)
+2026-04-26 13:22:16,872 - INFO - Loading datasets...
+2026-04-26 13:22:32,091 - INFO - Number of items: 12101
+2026-04-26 13:22:32,091 - INFO - Train samples: 22363
+2026-04-26 13:22:32,091 - INFO - Valid samples: 22363
+2026-04-26 13:22:32,091 - INFO - Test samples: 22363
+2026-04-26 13:22:32,092 - INFO - Initializing HMSR-HSTU model...
+2026-04-26 13:22:32,092 - INFO - ⚠️ 检测到 semantic_map 缺少第 0 行 (Padding)，正在自动补零对齐...
+2026-04-26 13:22:32,092 - INFO - 最终 item_semantic_map 维度: torch.Size([12102, 3])
+2026-04-26 13:22:32,115 - INFO - Model parameters: 874272
+2026-04-26 13:22:32,896 - INFO - Starting training...
+2026-04-26 13:22:50,514 - INFO - Training arguments: Namespace(dataset='beauty', root='../genrec/dataset/amazon', use_sampled_softmax=False, embed_dim=32, num_heads=2, num_blocks=2, dropout=0.2, max_seq_len=50, num_position_buckets=32, num_time_buckets=64, max_position_distance=128, use_temporal_bias=True, batch_size=128, epochs=100, lr=0.005, weight_decay=0.0, patience=50, device='cuda', checkpoint_dir='./checkpoints', eval_k=10)
+2026-04-26 13:22:50,514 - INFO - Loading datasets...
+2026-04-26 13:23:05,970 - INFO - Number of items: 12101
+2026-04-26 13:23:05,971 - INFO - Train samples: 22363
+2026-04-26 13:23:05,971 - INFO - Valid samples: 22363
+2026-04-26 13:23:05,971 - INFO - Test samples: 22363
+2026-04-26 13:23:05,971 - INFO - Initializing HMSR-HSTU model...
+2026-04-26 13:23:05,971 - INFO - ⚠️ 检测到 semantic_map 缺少第 0 行 (Padding)，正在自动补零对齐...
+2026-04-26 13:23:05,972 - INFO - 最终 item_semantic_map 维度: torch.Size([12102, 3])
+2026-04-26 13:23:05,995 - INFO - Model parameters: 874272
+2026-04-26 13:23:06,791 - INFO - Starting training...
