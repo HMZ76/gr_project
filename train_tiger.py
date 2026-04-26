@@ -95,15 +95,29 @@ def main():
         num_workers=0
     )
 
+    test_dataset = TigerDataset(
+        root="../genrec/dataset/amazon",
+        rqvae_path="rqvae_best_model.pth",
+        train_test_split='test',
+        device=device
+    )
+    test_dataloader = DataLoader(
+        test_dataset,
+        batch_size=128,
+        shuffle=False,
+        collate_fn=tiger_collate_fn,
+        num_workers=0
+    )
+
     # ========================
     # 3. 模型初始化
     # ========================
     model = Tiger(
-        embedding_dim=128,
-        attn_dim=512,
-        dropout=0.1,
+        embedding_dim=512,
+        attn_dim=384,
+        dropout=0.2,
         num_heads=8,
-        n_layers=8,
+        n_layers=2,
         num_item_embeddings=256,   # 对应 RQ-VAE codebook_size
         num_user_embeddings=10000, # 增加用户嵌入数量以避免索引越界
         sem_id_dim=3               # 对应 RQ-VAE num_codebooks
@@ -113,7 +127,7 @@ def main():
     # 4. 优化器与训练设置
     # ========================
     optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=1e-4)
-    num_epochs = 10
+    num_epochs = 100
 
     # ========================
     # 5. 训练循环
@@ -168,8 +182,10 @@ def main():
         # 注: 如果你有 valid_item_ids (全局合法的 Semantic IDs 集合)，请在这里传入
         recall_5, ndcg_5 = evaluate(model, val_dataloader, device, k=5, valid_item_ids=None)
         recall_10, ndcg_10 = evaluate(model, val_dataloader, device, k=10, valid_item_ids=None)
-        
+        test_recall_5, test_ndcg_5 = evaluate(model, test_dataloader, device, k=5, valid_item_ids=None)
+        test_recall_10, test_ndcg_10 = evaluate(model, test_dataloader, device, k=10, valid_item_ids=None)
         print(f"Epoch [{epoch+1}/{num_epochs}] | Recall@5: {recall_5:.4f} | NDCG@5: {ndcg_5:.4f} | Recall@10: {recall_10:.4f} | NDCG@10: {ndcg_10:.4f}")
+        print(f"测试集评估结果 | Recall@5: {test_recall_5:.4f} | NDCG@5: {test_ndcg_5:.4f} | Recall@10: {test_recall_10:.4f} | NDCG@10: {test_ndcg_10:.4f}")
         print("-" * 80)
 
     # ========================
@@ -177,6 +193,12 @@ def main():
     # ========================
     torch.save(model.state_dict(), "tiger_model_weights.pth")
     print("TIGER 模型权重已保存至 tiger_model_weights.pth")
+
+    # =========================
+    # 8. 测试模型
+    # =========================
+    model.load_state_dict(torch.load("tiger_model_weights.pth"))
+    
 
 if __name__ == "__main__":
     main()

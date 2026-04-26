@@ -232,19 +232,6 @@ def build_tensor_trie(
 
     return children_mask, transition, num_nodes
 
-class TigerOutput(NamedTuple):
-    """
-    Tiger output
-    """
-    logits: torch.Tensor
-    loss: torch.Tensor
-
-class TigerGenerationOutput(NamedTuple):
-    """
-    Tiger generation output
-    """
-    sem_ids: torch.Tensor
-    log_probas: torch.Tensor
 
 
 class Tiger(nn.Module):
@@ -286,6 +273,7 @@ class Tiger(nn.Module):
         self.norm = RMSNorm(embedding_dim)
         self.norm_context = RMSNorm(embedding_dim)
         self.drop = nn.Dropout(p=dropout)
+
         self.sem_id_embedding = SemIdEmbedding(
             num_embeddings=num_item_embeddings,
             sem_ids_dim=sem_id_dim,
@@ -355,12 +343,13 @@ class Tiger(nn.Module):
         user_emb = self.user_id_embedding(user_input_ids)
         item_emb = self.sem_id_embedding(item_input_ids, token_type_ids)
         B, N, D = item_emb.shape
-
+        
         encoder_input = torch.cat([user_emb, item_emb], dim=1)
 
         if target_input_ids is not None:
             target_emb = self.sem_id_embedding(target_input_ids, target_token_type_ids)
             decoder_input = torch.cat([self.bos_embedding.repeat(B, 1, 1), target_emb], dim=1)
+            
         else:
             decoder_input = self.bos_embedding.repeat(B, 1, 1)
 
@@ -368,10 +357,12 @@ class Tiger(nn.Module):
             torch.ones((seq_mask.size(0), 1), dtype=seq_mask.dtype, device=seq_mask.device),  # user token
             seq_mask
         ], dim=1)
+        
         f_mask = torch.zeros_like(encoder_mask, dtype=torch.float32)
         f_mask[~encoder_mask.bool()] = 1
         f_mask = f_mask.bool()
-
+        
+        
         encoder_input = self.drop(self.norm_context(encoder_input))
         decoder_input = self.drop(self.norm(decoder_input))
         if self.use_proj:
@@ -380,6 +371,8 @@ class Tiger(nn.Module):
 
         # causal mask for decoder (cached)
         causal_mask = self._get_causal_mask(decoder_input.shape[1], decoder_input.device)
+        
+
         decoder_out = self.transformer(
             src=encoder_input,
             tgt=decoder_input,
@@ -390,28 +383,6 @@ class Tiger(nn.Module):
         
         logits = self.output_head(decoder_out)
         loss_logits = logits[:, :-1, :]
-
-        """
-        step_logits = []
-        for t in range(decoder_out.shape[1]):                  # t = 0 .. T-1
-            l = self.output_heads[t](decoder_out[:, t, :])     # (B, V)
-            step_logits.append(l.unsqueeze(1))                 # (B, 1, V)
-
-        logits = torch.cat(step_logits, dim=1)[:, :-1, :]
-        """
-        
-        """
-        decoder_out = self.out_proj(decoder_out)
-        step_logits = []
-        for t in range(min(self.sem_id_dim, decoder_out.shape[1])):
-            dec_vec = decoder_out[:, t, :]
-            start = t * self.num_item_embeddings
-            end = (t + 1) * self.num_item_embeddings
-            weight_slice = self.sem_id_embedding.emb.weight[start:end]
-            logits_t = F.linear(dec_vec, weight_slice)
-            step_logits.append(logits_t.unsqueeze(1))
-        logits = torch.cat(step_logits, dim=1)
-        """
 
         if target_input_ids is not None and target_input_ids.shape[1] == self.sem_id_dim:
             # Convert to full vocab indices: token_type * num_embeddings + input_id
@@ -530,10 +501,10 @@ class Tiger(nn.Module):
         # Encode context once
         memory, memory_mask = self._encode_context(
             user_input_ids, item_input_ids, token_type_ids, seq_mask
-        )
+        ) # (B, N, D), (B, N)
         # Expand for beam search
-        memory = memory.unsqueeze(1).expand(-1, K, -1, -1).reshape(B * K, memory.size(1), -1)
-        memory_mask = memory_mask.unsqueeze(1).expand(-1, K, -1).reshape(B * K, -1)
+        memory = memory.unsqueeze(1).expand(-1, K, -1, -1).reshape(B * K, memory.size(1), -1) # (B*K, N, D)
+        memory_mask = memory_mask.unsqueeze(1).expand(-1, K, -1).reshape(B * K, -1) # (B*K, N)
 
         beam_seqs = torch.empty(B, K, 0, dtype=torch.long, device=device)
         beam_logps = torch.zeros(B, K, device=device)
@@ -559,7 +530,7 @@ class Tiger(nn.Module):
                 tgt_ids_ = tgt_ids
                 tgt_type_ = torch.arange(tgt_ids.size(1), device=device).unsqueeze(0).expand(B * K, -1)
 
-            logits = self._decode_step(memory, memory_mask, tgt_ids_, tgt_type_)
+            logits = self._decode_step(memory, memory_mask, tgt_ids_, tgt_type_) # [B*K, N, I]
 
             vocab_offset = step * NIE
 
@@ -575,10 +546,11 @@ class Tiger(nn.Module):
                 mask[:, vocab_offset:vocab_offset + NIE] = 0
                 logits = logits + mask
 
-            log_probs = torch.log_softmax(logits / temperature, dim=-1)
-            cand_logp, cand_token = torch.topk(log_probs, k=KK, dim=-1)
+            log_probs = torch.log_softmax(logits / temperature, dim=-1) # (B*K, N, I)
+            cand_logp, cand_token = torch.topk(log_probs, k=KK, dim=-1) # (B, K, N, KK)
+            
             cand_token = cand_token - vocab_offset  # now in [0, NIE)
-            cand_logp = cand_logp.view(B, K, KK)
+            cand_logp = cand_logp.view(B, K, KK) 
             cand_token = cand_token.view(B, K, KK)
 
             total_logp = (beam_logps.unsqueeze(-1) + cand_logp).view(B, -1)  # (B, K*KK)
@@ -588,6 +560,7 @@ class Tiger(nn.Module):
             # GPU-based beam dedup using encoded sequences
             # Encode candidate sequences: parent_enc * NIE + new_token
             parent_enc = beam_seq_encoded.unsqueeze(-1).expand(B, K, KK).reshape(B, -1)  # (B, K*KK)
+            
             cand_enc = parent_enc * NIE + total_tok  # (B, K*KK)
 
             # Sort by score descending
@@ -659,31 +632,12 @@ if __name__ == "__main__":
         sem_id_dim=3,
         max_pos=512 * 3
     )
+   
     model.cuda()
     model.eval()
     user_input_ids = torch.tensor([[1], [2]]).cuda()
     
-    item_input_ids = torch.tensor([
-        [43, 38, 217, 62, 183, 153, 72, 119, 121, 230, 237, 113, 3, 40, 41, 43, 52, 180, 768, 768, 768],
-        [75, 40, 33, 69, 69, 226, 3, 89, 210, 768, 768, 768, 768, 768, 768, 768, 768, 768, 768, 768, 768]]).cuda()
-    token_type_ids = torch.tensor([
-        [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 0, 0],
-        [ 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]).cuda()
-    target_input_ids = torch.tensor([[142, 39, 121],
-        [194, 17, 237]]).cuda()
-    target_token_type_ids = torch.tensor([[0, 1, 2], [0, 1, 2]]).cuda()
-    seq_mask = torch.tensor([
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
-        [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]).cuda()
-    with torch.no_grad():
-        out = model(
-            user_input_ids=user_input_ids,
-            item_input_ids=item_input_ids,
-            token_type_ids=token_type_ids,
-            target_input_ids=target_input_ids,
-            target_token_type_ids=target_token_type_ids,
-            seq_mask=seq_mask,
-        )
+
 
     item_input_ids = torch.tensor([
         [43, 38, 217, 62, 183, 153, 72, 119, 121, 230, 237, 113, 3, 40, 41, 43, 52, 180],
@@ -734,8 +688,8 @@ if __name__ == "__main__":
             valid_item_ids=valid_item_ids,
             seq_mask=seq_mask,
         )
-    print(item_input_ids)
-    print(generated)
+
+  
 
 
     item_input_ids = torch.tensor([
@@ -763,7 +717,6 @@ if __name__ == "__main__":
             valid_item_ids=valid_item_ids,
             seq_mask=seq_mask,
         )
-    print(item_input_ids)
+    
+
     print(generated)
-
-

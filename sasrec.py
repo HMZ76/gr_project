@@ -46,7 +46,7 @@ class SASRec(nn.Module):
 
         # Embeddings: item 0 is padding (will be zeroed)
         self.item_embedding = nn.Embedding(num_items + 1, embed_dim, padding_idx=0)
-        self.position_embedding = nn.Embedding(max_seq_len, embed_dim)
+        self.position_embedding = nn.Embedding(max_seq_len, embed_dim) # 加性位置编码
 
         # Dropout for embeddings
         self.emb_dropout = nn.Dropout(dropout)
@@ -180,10 +180,13 @@ class SASRecBlock(nn.Module):
         """
         # Self-attention: normalize queries only (as in official impl)
         # Residual is added inside attention
-        x = self.attention(self.norm1(x), x, mask)
+        pre_x = x
+        x = self.norm1(x)
+        x = self.attention(x, x, mask)
+        x = x + pre_x
 
         # Feed-forward with residual (added inside ffn)
-        x = self.ffn(self.norm2(x), x)
+        x = self.ffn(self.norm2(x)) + x
 
         return x
 
@@ -218,6 +221,7 @@ class MultiHeadAttention(nn.Module):
         key_value: torch.Tensor,  # [B, L, D] - not normalized (original x)
         mask: torch.Tensor,  # [B, L, 1]
     ) -> torch.Tensor:
+        
         B, L, _ = query.shape
 
         # Project Q from normalized input, K/V from original input
@@ -264,7 +268,8 @@ class MultiHeadAttention(nn.Module):
 
         # Residual connection (inside attention as in official impl)
         # Note: residual uses the normalized query, not original x
-        out = out + query
+        # 
+        #out = out + query
 
         return out
 
@@ -278,7 +283,7 @@ class PointWiseFeedForward(nn.Module):
         self.fc2 = nn.Linear(ffn_dim, embed_dim)
         self.dropout = nn.Dropout(dropout)
 
-    def forward(self, x: torch.Tensor, residual: torch.Tensor) -> torch.Tensor:
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Args:
             x: Normalized input [B, L, D]
@@ -286,23 +291,29 @@ class PointWiseFeedForward(nn.Module):
         """
         out = self.fc2(self.dropout(F.relu(self.fc1(x))))
         out = self.dropout(out)
-        return out + residual  # Residual connection
+        return out
 
 
 if __name__ == "__main__":
-    from dataset import AmazonSASRecDataset, sasrec_collate_fn
+    from dataset import AmazonDataset, sasrec_collate_fn
     from torch.utils.data import DataLoader
-    dataset = AmazonSASRecDataset(root="../genrec/dataset/amazon", split="beauty")
+    dataset = AmazonDataset(root="../genrec/dataset/amazon", split="beauty", min_seq_len=5)
     num_items = dataset.num_items
-    model = SASRec(num_items=num_items, embed_dim=64, num_heads=2, num_blocks=2, ffn_dim=256)
     loss_type = "ce"
     max_seq_len = 50
+    model = SASRec(num_items=num_items, embed_dim=64, num_heads=2, num_blocks=2, ffn_dim=256, loss_type="ce")
 
-    collate_train = lambda x: sasrec_collate_fn(x, max_seq_len, num_items=num_items if loss_type == "bce" else 0)
 
-    dataloader = DataLoader(dataset, batch_size=2, shuffle=True, collate_fn=collate_train)
+    collate_train = lambda x: sasrec_collate_fn(x, max_seq_len,num_items=num_items if loss_type == "ce" else 0)
+
+    dataloader = DataLoader(dataset, batch_size=128, shuffle=True, collate_fn=collate_train)
     data = next(iter(dataloader))
     input_ids = data['input_ids']
     targets = data['targets']
-    negatives = data.get('negatives', None)
+    
+    print("Input IDs:", input_ids)
+    print("Targets:", targets)
+  
+    logits, loss = model(input_ids, targets)
+    print("Logits shape:", logits.shape)
     

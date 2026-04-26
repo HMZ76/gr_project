@@ -206,7 +206,7 @@ if __name__ == "__main__":
             
             recon_loss = criterion(x_recon, x)
             commit_loss = criterion(z_q.detach(), z)
-            loss = recon_loss + commit_loss 
+            loss = recon_loss + 0.25*commit_loss 
             
             optimizer.zero_grad()
             loss.backward()

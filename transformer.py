@@ -25,8 +25,30 @@ class RMSNorm(nn.Module):
         x = x * torch.rsqrt(variance + self.eps)
         return self.weight * x
 
-# 为了兼容性保留别名，防止外部代码调用报错
-RootMeanSquareLayerNorm = RMSNorm
+class RootMeanSquareLayerNorm(nn.Module):
+    """
+    Root mean square layer normalization.
+    """
+    def __init__(self, hidden_size, eps=1e-6):
+        """
+        Construct a layernorm module in the T5 style. No bias and no subtraction of mean.
+        """
+        super().__init__()
+        self.weight = nn.Parameter(torch.ones(hidden_size))
+        self.variance_epsilon = eps
+
+    def forward(self, hidden_states):
+        """
+        make sure float32 for variance calculation
+        """
+        variance = hidden_states.to(torch.float32).pow(2).mean(-1, keepdim=True)
+        hidden_states = hidden_states * torch.rsqrt(variance + self.variance_epsilon)
+
+        # convert into half-precision if necessary
+        if self.weight.dtype in [torch.float16, torch.bfloat16]:
+            hidden_states = hidden_states.to(self.weight.dtype)
+
+        return self.weight * hidden_states
 
 
 # =========================================================================
@@ -60,6 +82,7 @@ def _relative_position_bucket(
     ret = torch.where(is_small, ret, large_val)
     if bidirectional:
         ret = ret + sign * num_buckets
+   
     return ret
 
 
@@ -141,6 +164,7 @@ class T5Attention(nn.Module):
             buckets = buckets.unsqueeze(0).expand(self.n_heads, -1, -1)
             head_offset = (torch.arange(self.n_heads, device=device)
                 * self.num_relative_buckets)[:, None, None]
+            
             idx = (buckets + head_offset).flatten()
             self._bucket_cache[cache_key] = idx
 
@@ -185,10 +209,11 @@ class T5Attention(nn.Module):
         # (always recompute when this layer owns the bias, even if passed one exists)
         if self.rel_bias is not None:
             position_bias = self._get_rel_bias(q.size(-2), k.size(-2), q.device)
-
+        
         # Apply position bias (whether computed here or passed from first layer)
         if position_bias is not None:
             scores = scores + position_bias
+            
 
         if key_padding_mask is not None:
             scores = scores.masked_fill(key_padding_mask[:, None, None, :], -1e9)
@@ -266,7 +291,7 @@ class MultiHeadAttention(nn.Module):
             dropout=dropout,
             is_cross_attention=is_cross_attention,
             has_relative_bias=has_relative_bias,
-            num_relative_buckets=32,
+            num_relative_buckets=64,
             max_distance=128,
             d_kv=d_kv,
             scale_attn=scale_attn,
